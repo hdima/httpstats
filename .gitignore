@@ -1,1 +1,3 @@
 httpstat
+access.log
+access.log.*
