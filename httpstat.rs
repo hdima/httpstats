@@ -6,6 +6,8 @@ use std::io::buffered::BufferedReader;
 
 use nginx::NginxLogParser;
 
+
+mod log;
 mod nginx;
 
 fn parse(filename: &str) {

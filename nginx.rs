@@ -3,12 +3,8 @@ use std::io::Buffer;
 
 use extra::time::{Tm, strptime};
 
-// TODO: Probably should be moved to another module?
-pub struct HTTPLogRecord {
-    remote_addr: ~str,
-    local_time: Tm,
-    host: ~str,
-}
+use log::HTTPLogRecord;
+
 
 pub struct NginxLogParser<B> {
     priv buffer: B
@@ -30,49 +26,106 @@ impl<R: Buffer> Iterator<HTTPLogRecord> for NginxLogParser<R> {
 }
 
 fn create_log_record(line: ~str) -> HTTPLogRecord {
-    let (mut idx, remote_addr) = get_field(line, 0);
+    let (remote_addr, mut tail) = get_field(line);
     // User
-    idx = skip_field(line, idx);
-    let (mut idx, local_time) = get_local_time(line, idx);
-    // FIXME: We skip the trailing space with index increment here.
-    // It's probably better to just skip spaces?
-    let (_, host) = get_field(line, idx + 1);
+    tail = skip_field(tail);
+    let (local_time, tail) = get_local_time(tail);
+    let (host, mut tail) = get_field(tail);
+    // Pipe
+    tail = skip_field(tail);
+    let (request_time, tail) = get_request_time(tail);
+    let (method, path, tail) = get_method_path(tail);
+    let (status, tail) = get_status(tail);
+    let (sent_bytes, tail) = get_sent_bytes(tail);
+    // FIXME: What to do with "-" for referer and user agent? Should we
+    // replace them with empty string or None for example?
+    let (referer, tail) = get_delimited_field(tail, '"', '"');
+    let (user_agent, _) = get_delimited_field(tail, '"', '"');
     HTTPLogRecord{
         remote_addr: remote_addr,
         local_time: local_time,
         host: host,
+        request_time: request_time,
+        method: method,
+        path: path,
+        status: status,
+        sent_bytes: sent_bytes,
+        referer: referer,
+        user_agent: user_agent,
         }
 }
 
-fn get_field(line: &str, start: uint) -> (uint, ~str) {
-    let slice = line.slice_from(start);
+fn get_field<'a>(line: &'a str) -> (~str, &'a str) {
+    let slice = line.trim_left();
     match slice.find(' ') {
-        Some(end) => (start + end + 1, slice.slice_to(end).to_owned()),
-        None => fail!("incomplete string: {}", line)
-    }
-}
-
-fn skip_field(line: &str, start: uint) -> uint {
-    let slice = line.slice_from(start);
-    match slice.find(' ') {
-        Some(end) => start + end + 1,
-        None => fail!("incomplete string: {}", line)
-    }
-}
-
-fn get_local_time(line: &str, start: uint) -> (uint, Tm) {
-    let slice = line.slice_from(start);
-    if slice.len() < 1 || slice[0] != '[' as u8 {
-        fail!("incomplete string: {}", line);
-    }
-    match slice.find(']') {
         Some(end) => {
-            let str_time = slice.slice(1, end);
-            match strptime(str_time, "%d/%b/%Y:%H:%M:%S %z") {
-                Ok(local_time) => (start + end + 1, local_time),
-                Err(err) => fail!("time parse error for {}: {}", line, err)
-            }
+            (slice.slice_to(end).to_owned(), slice.slice_from(end + 1))
         }
         None => fail!("incomplete string: {}", line)
     }
+}
+
+fn skip_field<'a>(line: &'a str) -> &'a str {
+    let slice = line.trim_left();
+    match slice.find(' ') {
+        Some(end) => slice.slice_from(end + 1),
+        None => fail!("incomplete string: {}", line)
+    }
+}
+
+fn get_delimited_field<'a>(line: &'a str, start: char, end: char) ->
+        (~str, &'a str) {
+    let mut slice = line.trim_left();
+    if slice.len() < 1 || slice[0] != start as u8 {
+        fail!("incomplete string: {}", line);
+    } else {
+        slice = slice.slice_from(1);
+        // FIXME: Should we skip escaped end characters? But probably not so
+        // important in this case
+        match slice.find(end) {
+            Some(end) => {
+                (slice.slice_to(end).to_owned(), slice.slice_from(end + 1))
+            }
+            None => fail!("incomplete string: {}", line)
+        }
+    }
+}
+
+fn get_local_time<'a>(line: &'a str) -> (Tm, &'a str) {
+    let (slice, tail) = get_delimited_field(line, '[', ']');
+    match strptime(slice, "%d/%b/%Y:%H:%M:%S %z") {
+        Ok(local_time) => (local_time, tail),
+        Err(err) => fail!("time parse error for {}: {}", line, err)
+    }
+}
+
+fn get_request_time<'a>(line: &'a str) -> (uint, &'a str) {
+    let (slice, tail) = get_field(line);
+    match slice.find('.') {
+        Some(pos) => {
+            let sec: int = from_str(slice.slice_to(pos)).unwrap();
+            let msec: int = from_str(slice.slice_from(pos + 1)).unwrap();
+            ((sec * 1000 + msec) as uint, tail)
+        }
+        None => fail!("invalid request time: {}", line)
+    }
+}
+
+fn get_method_path<'a>(line: &'a str) -> (~str, ~str, &'a str) {
+    let (slice, tail) = get_delimited_field(line, '"', '"');
+    let (method, req_tail) = get_field(slice);
+    let (path, _) = get_field(req_tail);
+    (method, path, tail)
+}
+
+fn get_status<'a>(line: &'a str) -> (u16, &'a str) {
+    let (slice, tail) = get_field(line);
+    let status: int = from_str(slice).unwrap();
+    (status as u16, tail)
+}
+
+fn get_sent_bytes<'a>(line: &'a str) -> (uint, &'a str) {
+    let (slice, tail) = get_field(line);
+    let bytes: int = from_str(slice).unwrap();
+    (bytes as uint, tail)
 }

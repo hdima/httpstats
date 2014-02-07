@@ -1,7 +1,9 @@
-httpstat: httpstat.rs nginx.rs
+SOURCES=$(wildcard *.rs)
+
+httpstat: ${SOURCES}
 	rustc $<
 
-debug: httpstat.rs nginx.rs
+debug: ${SOURCES}
 	rustc -Z debug-info $<
 
 clean:
