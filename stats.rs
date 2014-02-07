@@ -1,3 +1,4 @@
+use std::fmt;
 use std::hashmap::HashMap;
 
 use log::HTTPLogRecord;
@@ -52,27 +53,84 @@ impl Stats {
 }
 
 fn print_sorted(sorted: &[&ObjectStats], message: &str) {
-    println!("\n{}", message);
+    println!("\n  {}", message);
     println!("=====================================================\
               =============");
-    println!("Client                                  \
-              Request   Duration   Bytes");
+    println!("Client                                 \
+              Requests   Duration   Bytes");
     println!("-----------------------------------------------------\
               -------------");
     for stats in sorted.iter().take(NUMBER_OF_ITEMS) {
-        println!("{: <40} {: >6} {: >10.3f} {: >7}",
+        println!("{: <40} {: >6} {: >10} {: >7}",
                  stats.client, stats.requests,
-                 (stats.request_time as f32) / 1000.0,
+                 format_duration(stats.request_time),
                  format_bytes(stats.sent_bytes));
     }
 }
 
+fn format_duration(duration: uint) -> ~str {
+    // TODO: Cleanup code
+    if duration == 0 {
+        ~"0"
+    } else if duration < 1000 {
+        if duration % 100 == 0 {
+            format_args!(fmt::format, "0.{}s", duration / 100)
+        } else if duration % 10 == 0 {
+            format_args!(fmt::format, "0.{:02u}s", duration / 10)
+        } else {
+            format_args!(fmt::format, "0.{:03u}s", duration)
+        }
+    } else if duration < 60 * 1000 {
+        format_args!(fmt::format, "{}s{}", duration / 1000, duration % 1000)
+    } else if duration < 60 * 60 * 1000 {
+        format_args!(fmt::format, "{}m{}s", duration / (60 * 1000),
+                     (duration / 1000) % 60)
+    } else {
+        format_args!(fmt::format, "{}h{}m{}s", duration / (60 * 60 * 1000),
+                     (duration / (60 * 1000)) % 60, duration % (60 * 1000))
+    }
+}
+
 fn format_bytes(mut bytes: uint) -> ~str {
-    static modifiers: [&'static str, ..5] = ["", "K", "M", "G", "T"];
+    static modifiers: [&'static str, ..4] = ["", "K", "M", "G"];
     let mut i = 0;
-    while bytes > 1024 || i == 4 {
+    let max = modifiers.len() - 1;
+    while bytes >= 1024 && i != max {
         bytes /= 1024;
         i += 1;
     }
     bytes.to_str() + modifiers[i]
+}
+
+/*
+ * Tests
+ */
+#[cfg(test)]
+mod test {
+    use super::{format_duration, format_bytes};
+
+    #[test]
+    fn test_format_duration() {
+        assert_eq!(~"0", format_duration(0));
+        assert_eq!(~"0.009s", format_duration(9));
+        assert_eq!(~"0.09s", format_duration(90));
+        assert_eq!(~"0.9s", format_duration(900));
+        assert_eq!(~"0.999s", format_duration(999));
+        // TODO
+    }
+
+    #[test]
+    fn test_format_bytes() {
+        assert_eq!(~"0", format_bytes(0));
+        assert_eq!(~"9", format_bytes(9));
+        assert_eq!(~"90", format_bytes(90));
+        assert_eq!(~"900", format_bytes(900));
+        assert_eq!(~"1000", format_bytes(1000));
+        assert_eq!(~"1K", format_bytes(1024));
+        assert_eq!(~"2K", format_bytes(2048));
+        assert_eq!(~"4K", format_bytes(4096));
+        assert_eq!(~"1M", format_bytes(1024 * 1024));
+        assert_eq!(~"1G", format_bytes(1024 * 1024 * 1024));
+        assert_eq!(~"1024G", format_bytes(1024 * 1024 * 1024 * 1024));
+    }
 }

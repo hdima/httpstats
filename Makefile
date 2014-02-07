@@ -1,12 +1,21 @@
-SOURCES=$(wildcard *.rs)
+SOURCES=httpstat.rs $(wildcard *.rs)
 
 httpstat: ${SOURCES}
-	rustc $<
+	rustc $< -o $@
+
+386: httpstat.386
+
+httpstat.386: ${SOURCES}
+	rustc $< -o $@ --target=i686-unknown-linux-gnu
+
+test: ${SOURCES}
+	rustc --test -o $@ $<
+	./test
 
 debug: ${SOURCES}
-	rustc -Z debug-info $<
+	rustc -Z debug-info $< -o $@
 
 clean:
-	rm -f httpstat
+	rm -f httpstat.386 httpstat debug test
 
-.PHONY: clean debug
+.PHONY: clean debug 386 test

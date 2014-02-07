@@ -1,0 +1,4 @@
+- Support for multiple log files?
+- Support for '-' filename for STDIN?
+
+- Cleanup and update stats::format_duration() code
