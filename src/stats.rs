@@ -1,4 +1,4 @@
-use std::fmt;
+use std::str;
 use std::hashmap::HashMap;
 
 use log::HTTPLogRecord;
@@ -69,35 +69,46 @@ fn print_sorted(sorted: &[&ObjectStats], message: &str) {
 }
 
 fn format_duration(duration: uint) -> ~str {
-    // TODO: Cleanup code
-    if duration == 0 {
-        ~"0"
-    } else if duration < 1000 {
-        if duration % 100 == 0 {
-            format_args!(fmt::format, "0.{}s", duration / 100)
-        } else if duration % 10 == 0 {
-            format_args!(fmt::format, "0.{:02u}s", duration / 10)
+    let (mut n, mut pos, modifier) = if duration < 1000 {
+            (duration, 3, ~"s")
+        } else if duration < 60 * 1000 {
+            (duration / 100, 1, ~"s")
+        } else if duration < 60 * 60 * 1000 {
+            (duration / 6000, 1, ~"m")
         } else {
-            format_args!(fmt::format, "0.{:03u}s", duration)
-        }
-    } else if duration < 60 * 1000 {
-        format_args!(fmt::format, "{}s{}", duration / 1000, duration % 1000)
-    } else if duration < 60 * 60 * 1000 {
-        format_args!(fmt::format, "{}m{}s", duration / (60 * 1000),
-                     (duration / 1000) % 60)
-    } else {
-        format_args!(fmt::format, "{}h{}m{}s", duration / (60 * 60 * 1000),
-                     (duration / (60 * 1000)) % 60, duration % (60 * 1000))
+            (duration / 360000, 1, ~"h")
+        };
+    while pos > 0 && n % 10 == 0 {
+        n /= 10;
+        pos -= 1;
     }
+    let int_part = (n / pow(10, pos)).to_str();
+    let mut fract_part = str::with_capacity(pos + 1);
+    if pos != 0 && n != 0 {
+        fract_part.push_char('.');
+        while pos > 0 {
+            let digit = (n / pow(10, pos - 1)) % 10;
+            fract_part.push_char((digit as u8 + '0' as u8) as char);
+            pos -= 1;
+        }
+    }
+    int_part + fract_part + modifier
+}
+
+fn pow(n: uint, p: uint) -> uint {
+    let mut num = 1;
+    for _ in range(0, p) {
+        num *= n;
+    }
+    num
 }
 
 fn format_bytes(mut bytes: uint) -> ~str {
-    static modifiers: [&'static str, ..4] = ["", "K", "M", "G"];
-    let mut i = 0;
-    let max = modifiers.len() - 1;
-    while bytes >= 1024 && i != max {
+    static modifiers: [&'static str, ..4] = ["G", "M", "K", ""];
+    let mut i = modifiers.len() - 1;
+    while bytes >= 1024 && i != 0 {
         bytes /= 1024;
-        i += 1;
+        i -= 1;
     }
     bytes.to_str() + modifiers[i]
 }
@@ -111,12 +122,21 @@ mod test {
 
     #[test]
     fn test_format_duration() {
-        assert_eq!(~"0", format_duration(0));
+        assert_eq!(~"0s", format_duration(0));
         assert_eq!(~"0.009s", format_duration(9));
         assert_eq!(~"0.09s", format_duration(90));
         assert_eq!(~"0.9s", format_duration(900));
         assert_eq!(~"0.999s", format_duration(999));
-        // TODO
+        assert_eq!(~"1s", format_duration(1000));
+        assert_eq!(~"1s", format_duration(1009));
+        assert_eq!(~"1.4s", format_duration(1400));
+        assert_eq!(~"1.6s", format_duration(1600));
+        assert_eq!(~"59s", format_duration(59000));
+        assert_eq!(~"1m", format_duration(60000));
+        assert_eq!(~"1.5m", format_duration(90000));
+        assert_eq!(~"1h", format_duration(60 * 60 * 1000));
+        assert_eq!(~"1.5h", format_duration(90 * 60 * 1000));
+        assert_eq!(~"10h", format_duration(10 * 60 * 60 * 1000));
     }
 
     #[test]
