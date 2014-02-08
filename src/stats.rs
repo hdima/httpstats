@@ -4,6 +4,7 @@ use std::hashmap::HashMap;
 use log::HTTPLogRecord;
 
 
+// TODO: Should be moved outside
 static NUMBER_OF_ITEMS: uint = 8u;
 
 struct ObjectStats {
