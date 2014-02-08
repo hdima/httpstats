@@ -1,4 +1,5 @@
 - Support for multiple log files?
 - Support for '-' filename for STDIN?
+- Calculate total statistics and display percentage for all values?
 
 - Cleanup and update stats::format_duration() code

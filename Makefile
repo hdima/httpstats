@@ -1,4 +1,4 @@
-SOURCES=httpstat.rs $(wildcard *.rs)
+SOURCES=src/httpstat.rs $(wildcard src/*.rs)
 
 httpstat: ${SOURCES}
 	rustc $< -o $@
@@ -6,6 +6,7 @@ httpstat: ${SOURCES}
 386: httpstat.386
 
 httpstat.386: ${SOURCES}
+	# FIXME: Add also --link-args -static?
 	rustc $< -o $@ --target=i686-unknown-linux-gnu
 
 test: ${SOURCES}
