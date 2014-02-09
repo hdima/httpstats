@@ -1,3 +1,6 @@
 - Support for '-' filename for STDIN?
 - Calculate total statistics and display percentage for all values?
 - We can also calculate connection speed based on size and time
+- Parse log based on arguments passed to the constructor
+
+- Try to use borrowed str object in HTTPLogRecord

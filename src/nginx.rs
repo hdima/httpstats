@@ -59,7 +59,7 @@ fn get_field<'a>(line: &'a str) -> (~str, &'a str) {
     let slice = line.trim_left();
     match slice.find(' ') {
         Some(end) => {
-            (slice.slice_to(end).to_owned(), slice.slice_from(end + 1))
+            (slice.slice_to(end).into_owned(), slice.slice_from(end + 1))
         }
         None => fail!("incomplete string: {}", line)
     }
@@ -84,7 +84,7 @@ fn get_delimited_field<'a>(line: &'a str, start: char, end: char) ->
         // important in this case
         match slice.find(end) {
             Some(end) => {
-                (slice.slice_to(end).to_owned(), slice.slice_from(end + 1))
+                (slice.slice_to(end).into_owned(), slice.slice_from(end + 1))
             }
             None => fail!("incomplete string: {}", line)
         }
