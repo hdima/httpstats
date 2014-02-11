@@ -4,8 +4,6 @@
 - Parse log based on arguments passed to the constructor
 - Print filename (and line?) for log parsing errors
 - Try to use borrowed str object in HTTPLogRecord
-- It seems if request path is too long we just get the first part of the
-  request in the log up to the size limit. For example: "HEAD /long-long-path"
 - Should we decode path? For example /" will be replaced with /\x22 in the log
 - Can we store the whole owned log line in the HTTPLogRecord and borrow all the
   parts from it?

@@ -65,6 +65,16 @@ fn get_field<'a>(line: &'a str) -> (~str, &'a str) {
     }
 }
 
+fn get_field_or<'a>(line: &'a str, default: ~str) -> (~str, &'a str) {
+    let slice = line.trim_left();
+    match slice.find(' ') {
+        Some(end) => {
+            (slice.slice_to(end).into_owned(), slice.slice_from(end + 1))
+        }
+        None => (default, &'a "")
+    }
+}
+
 fn skip_field<'a>(line: &'a str) -> &'a str {
     let slice = line.trim_left();
     match slice.find(' ') {
@@ -113,8 +123,8 @@ fn get_request_time<'a>(line: &'a str) -> (uint, &'a str) {
 
 fn get_method_path<'a>(line: &'a str) -> (~str, ~str, &'a str) {
     let (slice, tail) = get_delimited_field(line, '"', '"');
-    let (method, req_tail) = get_field(slice);
-    let (path, _) = get_field(req_tail);
+    let (method, req_tail) = get_field_or(slice, ~"");
+    let (path, _) = get_field_or(req_tail, ~"");
     (method, path, tail)
 }
 
