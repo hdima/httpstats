@@ -2,8 +2,8 @@
 - Calculate total statistics and display percentage for all values?
 - We can also calculate connection speed based on size and time
 - Parse log based on arguments passed to the constructor
-- Print filename (and line?) for log parsing errors
-- Try to use borrowed str object in HTTPLogRecord
+- Print filename (and line?) for log parsing errors? Probably not easy since
+  we use merged reader.
 - Should we decode path? For example /" will be replaced with /\x22 in the log
-- Can we store the whole owned log line in the HTTPLogRecord and borrow all the
-  parts from it?
+- Replace next() method with something like process(stats)? In this case we can
+  easily use borrowed substrings in HTTPLogRecord.
