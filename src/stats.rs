@@ -13,6 +13,8 @@ struct ObjectStats {
     sent_bytes: uint
 }
 
+type KeyValue<'r> = (&'r ~str, &'r ObjectStats);
+
 pub struct LogStats {
     priv clients: HashMap<~str, ObjectStats>
 }
@@ -23,7 +25,7 @@ impl LogStats {
     }
 
     pub fn print(&self) {
-        let mut stats: ~[(&~str, &ObjectStats)] = self.clients.iter().collect();
+        let mut stats: ~[KeyValue] = self.clients.iter().collect();
         stats.sort_by(|&(_, a), &(_, b)| b.requests.cmp(&a.requests));
         print_sorted(stats, "By requests");
         stats.sort_by(|&(_, a), &(_, b)| b.request_time.cmp(&a.request_time));
@@ -36,7 +38,7 @@ impl LogStats {
 impl LogProcessor for LogStats {
     fn process(&mut self, record: HTTPLogRecord) {
         self.clients.insert_or_update_with(
-            record.remote_addr.to_owned(),
+            record.remote_addr.into_owned(),
             ObjectStats{
                 requests: 1,
                 request_time: record.request_time,
@@ -50,7 +52,7 @@ impl LogProcessor for LogStats {
     }
 }
 
-fn print_sorted(sorted: &[(&~str, &ObjectStats)], message: &str) {
+fn print_sorted(sorted: &[KeyValue], message: &str) {
     println!("\n  {}", message);
     println!("=====================================================\
               =============");
