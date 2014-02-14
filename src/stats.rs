@@ -8,7 +8,6 @@ use log::{HTTPLogRecord, LogProcessor};
 static NUMBER_OF_ITEMS: uint = 8u;
 
 struct ObjectStats {
-    client: ~str,
     requests: uint,
     request_time: uint,
     sent_bytes: uint
@@ -24,13 +23,13 @@ impl LogStats {
     }
 
     pub fn print(&self) {
-        let mut sorted: ~[&ObjectStats] = self.clients.values().collect();
-        sorted.sort_by(|a, b| b.requests.cmp(&a.requests));
-        print_sorted(sorted, "By requests");
-        sorted.sort_by(|a, b| b.request_time.cmp(&a.request_time));
-        print_sorted(sorted, "By request time");
-        sorted.sort_by(|a, b| b.sent_bytes.cmp(&a.sent_bytes));
-        print_sorted(sorted, "By sent bytes");
+        let mut stats: ~[(&~str, &ObjectStats)] = self.clients.iter().collect();
+        stats.sort_by(|&(_, a), &(_, b)| b.requests.cmp(&a.requests));
+        print_sorted(stats, "By requests");
+        stats.sort_by(|&(_, a), &(_, b)| b.request_time.cmp(&a.request_time));
+        print_sorted(stats, "By request time");
+        stats.sort_by(|&(_, a), &(_, b)| b.sent_bytes.cmp(&a.sent_bytes));
+        print_sorted(stats, "By sent bytes");
     }
 }
 
@@ -39,7 +38,6 @@ impl LogProcessor for LogStats {
         self.clients.insert_or_update_with(
             record.remote_addr.to_owned(),
             ObjectStats{
-                client: record.remote_addr.to_owned(),
                 requests: 1,
                 request_time: record.request_time,
                 sent_bytes: record.sent_bytes,
@@ -52,7 +50,7 @@ impl LogProcessor for LogStats {
     }
 }
 
-fn print_sorted(sorted: &[&ObjectStats], message: &str) {
+fn print_sorted(sorted: &[(&~str, &ObjectStats)], message: &str) {
     println!("\n  {}", message);
     println!("=====================================================\
               =============");
@@ -60,9 +58,9 @@ fn print_sorted(sorted: &[&ObjectStats], message: &str) {
               Requests   Duration   Bytes");
     println!("-----------------------------------------------------\
               -------------");
-    for stats in sorted.iter().take(NUMBER_OF_ITEMS) {
+    for &(client, stats) in sorted.iter().take(NUMBER_OF_ITEMS) {
         println!("{: <40} {: >6} {: >10} {: >7}",
-                 stats.client, stats.requests,
+                 *client, stats.requests,
                  format_duration(stats.request_time),
                  format_bytes(stats.sent_bytes));
     }
