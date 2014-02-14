@@ -1,13 +1,13 @@
 SOURCES=src/httpstat.rs $(wildcard src/*.rs)
 
 httpstat: ${SOURCES}
-	rustc $< -o $@
+	rustc --opt-level=3 $< -o $@
 
 386: httpstat.386
 
 httpstat.386: ${SOURCES}
 	# FIXME: Add also --link-args -static?
-	rustc $< -o $@ --target=i686-unknown-linux-gnu
+	rustc --opt-level=3 $< -o $@ --target=i686-unknown-linux-gnu
 
 test: ${SOURCES}
 	rustc --test -o $@ $<
