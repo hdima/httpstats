@@ -1,11 +1,11 @@
-SOURCES=src/httpstat.rs $(wildcard src/*.rs)
+SOURCES=src/httpstats.rs $(wildcard src/*.rs)
 
-httpstat: ${SOURCES}
+httpstats: ${SOURCES}
 	rustc --opt-level=3 $< -o $@
 
-386: httpstat.386
+386: httpstats.386
 
-httpstat.386: ${SOURCES}
+httpstats.386: ${SOURCES}
 	# --link-args -static also can be added for statically linked binary
 	rustc --opt-level=3 $< -o $@ --target=i686-unknown-linux-gnu
 
@@ -17,6 +17,6 @@ debug: ${SOURCES}
 	rustc -Z debug-info $< -o $@
 
 clean:
-	rm -f httpstat.386 httpstat debug test
+	rm -f httpstats.386 httpstats debug test
 
 .PHONY: clean debug 386 test
