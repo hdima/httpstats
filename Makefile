@@ -6,7 +6,7 @@ httpstat: ${SOURCES}
 386: httpstat.386
 
 httpstat.386: ${SOURCES}
-	# FIXME: Add also --link-args -static?
+	# --link-args -static also can be added for statically linked binary
 	rustc --opt-level=3 $< -o $@ --target=i686-unknown-linux-gnu
 
 test: ${SOURCES}
