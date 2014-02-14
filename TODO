@@ -5,5 +5,4 @@
 - Print filename (and line?) for log parsing errors? Probably not easy since
   we use merged reader.
 - Should we decode path? For example /" will be replaced with /\x22 in the log
-- Replace next() method with something like process(stats)? In this case we can
-  easily use borrowed substrings in HTTPLogRecord.
+- Move format_duration() and format_bytes() functions to an utils module
