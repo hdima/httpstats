@@ -15,3 +15,11 @@ pub struct HTTPLogRecord {
     referer: ~str,
     user_agent: ~str,
 }
+
+pub trait LogProcessor {
+    fn process(&mut self, record: HTTPLogRecord);
+}
+
+pub trait LogParser {
+    fn parse(&self, processor: &LogProcessor);
+}

@@ -5,7 +5,7 @@ use std::io::fs::File;
 use std::io::util::ChainedReader;
 use std::io::buffered::BufferedReader;
 
-use stats::Stats;
+use stats::LogStats;
 use nginx::NginxLogParser;
 
 
@@ -20,11 +20,9 @@ fn parse(filenames: &[~str]) {
         });
     let file = ChainedReader::new(files);
     let reader = BufferedReader::new(file);
-    let mut stats = Stats::new();
+    let mut stats = LogStats::new();
     let mut parser = NginxLogParser::new(reader);
-    for record in parser {
-        stats.update(record);
-    }
+    parser.parse(stats);
     stats.print();
 }
 

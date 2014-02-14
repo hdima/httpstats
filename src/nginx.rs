@@ -1,9 +1,9 @@
-use std::iter::Iterator;
 use std::io::Buffer;
 
 use extra::time::{Tm, strptime};
 
 use log::HTTPLogRecord;
+use stats::LogStats;
 
 
 pub struct NginxLogParser<B> {
@@ -14,13 +14,11 @@ impl<R: Buffer> NginxLogParser<R> {
     pub fn new(buffer: R) -> NginxLogParser<R> {
         NginxLogParser{buffer: buffer}
     }
-}
 
-impl<R: Buffer> Iterator<HTTPLogRecord> for NginxLogParser<R> {
-    fn next(&mut self) -> Option<HTTPLogRecord> {
-        match self.buffer.read_line() {
-            Some(line) => Some(create_log_record(line)),
-            None => None
+    pub fn parse(&mut self, processor: &mut LogStats) {
+        for line in self.buffer.lines() {
+            let record = create_log_record(line);
+            processor.process(record);
         }
     }
 }

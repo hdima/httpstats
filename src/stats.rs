@@ -14,16 +14,26 @@ struct ObjectStats {
     sent_bytes: uint
 }
 
-pub struct Stats {
+pub struct LogStats {
     priv clients: HashMap<~str, ObjectStats>
 }
 
-impl Stats {
-    pub fn new() -> Stats {
-        Stats{clients: HashMap::new()}
+impl LogStats {
+    pub fn new() -> ~LogStats {
+        ~LogStats{clients: HashMap::new()}
     }
 
-    pub fn update(&mut self, record: HTTPLogRecord) {
+    pub fn print(&self) {
+        let mut sorted: ~[&ObjectStats] = self.clients.values().collect();
+        sorted.sort_by(|a, b| b.requests.cmp(&a.requests));
+        print_sorted(sorted, "By requests");
+        sorted.sort_by(|a, b| b.request_time.cmp(&a.request_time));
+        print_sorted(sorted, "By request time");
+        sorted.sort_by(|a, b| b.sent_bytes.cmp(&a.sent_bytes));
+        print_sorted(sorted, "By sent bytes");
+    }
+
+    pub fn process(&mut self, record: HTTPLogRecord) {
         match self.clients.find_mut(&record.remote_addr) {
             Some(stats) => {
                 stats.requests += 1;
@@ -40,16 +50,6 @@ impl Stats {
             sent_bytes: record.sent_bytes,
             };
         self.clients.insert(record.remote_addr, stats);
-    }
-
-    pub fn print(&self) {
-        let mut sorted: ~[&ObjectStats] = self.clients.values().collect();
-        sorted.sort_by(|a, b| b.requests.cmp(&a.requests));
-        print_sorted(sorted, "By requests");
-        sorted.sort_by(|a, b| b.request_time.cmp(&a.request_time));
-        print_sorted(sorted, "By request time");
-        sorted.sort_by(|a, b| b.sent_bytes.cmp(&a.sent_bytes));
-        print_sorted(sorted, "By sent bytes");
     }
 }
 
