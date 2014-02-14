@@ -1,7 +1,7 @@
 use std::str;
 use std::hashmap::HashMap;
 
-use log::HTTPLogRecord;
+use log::{HTTPLogRecord, LogProcessor};
 
 
 // TODO: Should be moved outside
@@ -32,8 +32,10 @@ impl LogStats {
         sorted.sort_by(|a, b| b.sent_bytes.cmp(&a.sent_bytes));
         print_sorted(sorted, "By sent bytes");
     }
+}
 
-    pub fn process(&mut self, record: HTTPLogRecord) {
+impl LogProcessor for LogStats {
+    fn process(&mut self, record: HTTPLogRecord) {
         match self.clients.find_mut(&record.remote_addr) {
             Some(stats) => {
                 stats.requests += 1;

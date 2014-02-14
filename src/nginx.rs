@@ -2,8 +2,7 @@ use std::io::Buffer;
 
 use extra::time::{Tm, strptime};
 
-use log::HTTPLogRecord;
-use stats::LogStats;
+use log::{HTTPLogRecord, LogProcessor};
 
 
 pub struct NginxLogParser<B> {
@@ -15,7 +14,7 @@ impl<R: Buffer> NginxLogParser<R> {
         NginxLogParser{buffer: buffer}
     }
 
-    pub fn parse(&mut self, processor: &mut LogStats) {
+    pub fn parse<P: LogProcessor>(&mut self, processor: &mut P) {
         for line in self.buffer.lines() {
             let record = create_log_record(line);
             processor.process(record);
