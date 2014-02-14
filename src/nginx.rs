@@ -22,7 +22,7 @@ impl<R: Buffer> NginxLogParser<R> {
     }
 }
 
-fn create_log_record(line: ~str) -> HTTPLogRecord {
+fn create_log_record<'r>(line: &'r str) -> HTTPLogRecord<'r> {
     let (remote_addr, mut tail) = get_field(line);
     // User
     tail = skip_field(tail);
@@ -52,21 +52,21 @@ fn create_log_record(line: ~str) -> HTTPLogRecord {
         }
 }
 
-fn get_field<'a>(line: &'a str) -> (~str, &'a str) {
+fn get_field<'a>(line: &'a str) -> (&'a str, &'a str) {
     let slice = line.trim_left();
     match slice.find(' ') {
         Some(end) => {
-            (slice.slice_to(end).into_owned(), slice.slice_from(end + 1))
+            (slice.slice_to(end), slice.slice_from(end + 1))
         }
         None => fail!("incomplete string: {}", line)
     }
 }
 
-fn get_field_or<'a>(line: &'a str, default: ~str) -> (~str, &'a str) {
+fn get_field_or<'a>(line: &'a str, default: &'a str) -> (&'a str, &'a str) {
     let slice = line.trim_left();
     match slice.find(' ') {
         Some(end) => {
-            (slice.slice_to(end).into_owned(), slice.slice_from(end + 1))
+            (slice.slice_to(end), slice.slice_from(end + 1))
         }
         None => (default, &'a "")
     }
@@ -81,7 +81,7 @@ fn skip_field<'a>(line: &'a str) -> &'a str {
 }
 
 fn get_delimited_field<'a>(line: &'a str, start: char, end: char) ->
-        (~str, &'a str) {
+        (&'a str, &'a str) {
     let mut slice = line.trim_left();
     if slice.len() < 1 || slice[0] != start as u8 {
         fail!("incomplete string: {}", line);
@@ -91,7 +91,7 @@ fn get_delimited_field<'a>(line: &'a str, start: char, end: char) ->
         // important in this case
         match slice.find(end) {
             Some(end) => {
-                (slice.slice_to(end).into_owned(), slice.slice_from(end + 1))
+                (slice.slice_to(end), slice.slice_from(end + 1))
             }
             None => fail!("incomplete string: {}", line)
         }
@@ -118,10 +118,10 @@ fn get_request_time<'a>(line: &'a str) -> (uint, &'a str) {
     }
 }
 
-fn get_method_path<'a>(line: &'a str) -> (~str, ~str, &'a str) {
+fn get_method_path<'a>(line: &'a str) -> (&'a str, &'a str, &'a str) {
     let (slice, tail) = get_delimited_field(line, '"', '"');
-    let (method, req_tail) = get_field_or(slice, ~"");
-    let (path, _) = get_field_or(req_tail, ~"");
+    let (method, req_tail) = get_field_or(slice, "");
+    let (path, _) = get_field_or(req_tail, "");
     (method, path, tail)
 }
 

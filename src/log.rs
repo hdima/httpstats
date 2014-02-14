@@ -2,18 +2,18 @@ use extra::time::Tm;
 
 
 // HTTP log record
-pub struct HTTPLogRecord {
-    remote_addr: ~str,
+pub struct HTTPLogRecord<'r> {
+    remote_addr: &'r str,
     local_time: Tm,
-    host: ~str,
+    host: &'r str,
     // Request time in milliseconds
     request_time: uint,
-    method: ~str,
-    path: ~str,
+    method: &'r str,
+    path: &'r str,
     status: u16,
     sent_bytes: uint,
-    referer: ~str,
-    user_agent: ~str,
+    referer: &'r str,
+    user_agent: &'r str,
 }
 
 pub trait LogProcessor {
