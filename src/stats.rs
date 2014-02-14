@@ -36,27 +36,19 @@ impl LogStats {
 
 impl LogProcessor for LogStats {
     fn process(&mut self, record: HTTPLogRecord) {
-        if !update(self, &record) {
-            let stats = ObjectStats{
+        self.clients.insert_or_update_with(
+            record.remote_addr.to_owned(),
+            ObjectStats{
                 client: record.remote_addr.to_owned(),
                 requests: 1,
                 request_time: record.request_time,
                 sent_bytes: record.sent_bytes,
-                };
-            self.clients.insert(record.remote_addr, stats);
-        }
-    }
-}
-
-fn update(stats: &mut LogStats, record: &HTTPLogRecord) -> bool {
-    match stats.clients.find_mut(&record.remote_addr) {
-        Some(stats) => {
-            stats.requests += 1;
-            stats.request_time += record.request_time;
-            stats.sent_bytes += record.sent_bytes;
-            true
-        }
-        None => false
+                },
+            |_, stats| {
+                stats.requests += 1;
+                stats.request_time += record.request_time;
+                stats.sent_bytes += record.sent_bytes;
+            });
     }
 }
 
