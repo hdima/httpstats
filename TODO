@@ -6,3 +6,6 @@
   we use merged reader.
 - Should we decode path? For example /" will be replaced with /\x22 in the log
 - Move format_duration() and format_bytes() functions to an utils module
+- Split stats into a stats engine and a stats printers
+- What should we do with empty fields which marked as "-" in the log? Should
+  they be converted to an empty string or should we use Option instead?
