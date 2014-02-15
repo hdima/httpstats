@@ -34,8 +34,6 @@ fn create_log_record<'r>(line: &'r str) -> HTTPLogRecord<'r> {
     let (method, path, tail) = get_method_path(tail);
     let (status, tail) = get_status(tail);
     let (sent_bytes, tail) = get_sent_bytes(tail);
-    // FIXME: What to do with "-" for referer and user agent? Should we
-    // replace them with empty string or None for example?
     let (referer, tail) = get_delimited_field(tail, '"', '"');
     let (user_agent, _) = get_delimited_field(tail, '"', '"');
     HTTPLogRecord{
