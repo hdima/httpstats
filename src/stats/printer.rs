@@ -15,6 +15,7 @@ impl<'r> LogStatsPrinter<'r> {
 
     pub fn print(&self, limit: uint) {
         print_totals(&self.stats.total);
+        print(&self.stats.hosts, "by requests", "Hosts", limit);
         print(&self.stats.clients, "by requests", "Clients", limit);
         print(&self.stats.paths, "by requests", "Paths", limit);
         print(&self.stats.methods, "by requests", "Methods", limit);
@@ -52,7 +53,7 @@ fn print_sorted<T: IterBytes + Eq + Default>(sorted: &[StatsItem<T>],
               ============================\n\
               {: <57} Requests Duration Bytes\n\
               -----------------------------------------------------\
-              ----------------------------\n",
+              ----------------------------",
               key_title, title, key_title);
     for &(client, stats) in sorted.iter().take(limit) {
         println!("{: <60.60} {: >5} {: >8} {: >5}",

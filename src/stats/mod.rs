@@ -18,6 +18,7 @@ type StatsMap<T> = HashMap<T, ObjectStats>;
 pub struct LogStats {
     priv total: ObjectStats,
     priv clients: StatsMap<~str>,
+    priv hosts: StatsMap<~str>,
     priv methods: StatsMap<~str>,
     priv paths: StatsMap<~str>,
     priv statuses: StatsMap<u16>,
@@ -34,6 +35,7 @@ impl LogStats {
                 sent_bytes: 0
                 },
             clients: HashMap::new(),
+            hosts: HashMap::new(),
             methods: HashMap::new(),
             paths: HashMap::new(),
             statuses: HashMap::new(),
@@ -48,6 +50,7 @@ impl LogProcessor for LogStats {
     fn process(&mut self, record: HTTPLogRecord) {
         update_totals(&mut self.total, &record);
         update(&mut self.clients, record.remote_addr.into_owned(), &record);
+        update(&mut self.hosts, record.host.into_owned(), &record);
         update(&mut self.methods, record.method.into_owned(), &record);
         update(&mut self.paths, record.path.into_owned(), &record);
         update(&mut self.statuses, record.status, &record);
