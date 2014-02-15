@@ -1,4 +1,4 @@
-SOURCES=src/httpstats.rs $(wildcard src/*.rs)
+SOURCES=src/httpstats.rs $(wildcard src/*.rs) $(wildcard src/*/*.rs)
 
 httpstats: ${SOURCES}
 	rustc --opt-level=3 $< -o $@

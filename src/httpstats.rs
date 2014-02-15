@@ -6,6 +6,7 @@ use std::io::util::ChainedReader;
 use std::io::buffered::BufferedReader;
 
 use stats::LogStats;
+use stats::printer::LogStatsPrinter;
 use log::nginx::NginxLogParser;
 
 mod log;
@@ -22,7 +23,8 @@ fn parse(filenames: &[~str]) {
     let mut stats = LogStats::new();
     let mut parser = NginxLogParser::new(reader);
     parser.parse(stats);
-    stats.print();
+    let printer = LogStatsPrinter::new(stats);
+    printer.print();
 }
 
 fn main() {
