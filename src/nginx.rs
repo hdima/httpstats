@@ -32,8 +32,8 @@ fn create_log_record<'r>(line: &'r str) -> HTTPLogRecord<'r> {
     tail = skip_field(tail);
     let (request_time, tail) = get_request_time(tail);
     let (method, path, tail) = get_method_path(tail);
-    let (status, tail) = get_status(tail);
-    let (sent_bytes, tail) = get_sent_bytes(tail);
+    let (status, tail) = get_int(tail);
+    let (sent_bytes, tail) = get_int(tail);
     let (referer, tail) = get_delimited_field(tail, '"', '"');
     let (user_agent, _) = get_delimited_field(tail, '"', '"');
     HTTPLogRecord{
@@ -43,8 +43,8 @@ fn create_log_record<'r>(line: &'r str) -> HTTPLogRecord<'r> {
         request_time: request_time,
         method: method,
         path: path,
-        status: status,
-        sent_bytes: sent_bytes,
+        status: status as u16,
+        sent_bytes: sent_bytes as uint,
         referer: referer,
         user_agent: user_agent,
         }
@@ -123,14 +123,7 @@ fn get_method_path<'a>(line: &'a str) -> (&'a str, &'a str, &'a str) {
     (method, path, tail)
 }
 
-fn get_status<'a>(line: &'a str) -> (u16, &'a str) {
+fn get_int<'a>(line: &'a str) -> (uint, &'a str) {
     let (slice, tail) = get_field(line);
-    let status: int = from_str(slice).unwrap();
-    (status as u16, tail)
-}
-
-fn get_sent_bytes<'a>(line: &'a str) -> (uint, &'a str) {
-    let (slice, tail) = get_field(line);
-    let bytes: int = from_str(slice).unwrap();
-    (bytes as uint, tail)
+    (from_str(slice).unwrap(), tail)
 }
