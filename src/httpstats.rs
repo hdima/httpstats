@@ -6,12 +6,11 @@ use std::io::util::ChainedReader;
 use std::io::buffered::BufferedReader;
 
 use stats::LogStats;
-use nginx::NginxLogParser;
-
+use log::nginx::NginxLogParser;
 
 mod log;
-mod nginx;
 mod stats;
+
 
 fn parse(filenames: &[~str]) {
     let files = filenames.iter().map(|filename| {

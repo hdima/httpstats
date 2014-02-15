@@ -2,7 +2,7 @@ use std::io::Buffer;
 
 use extra::time::{Tm, strptime};
 
-use log::{HTTPLogRecord, LogProcessor};
+use super::{HTTPLogRecord, LogProcessor};
 
 
 pub struct NginxLogParser<B> {

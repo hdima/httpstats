@@ -1,5 +1,7 @@
 use extra::time::Tm;
 
+pub mod nginx;
+
 
 // HTTP log record
 pub struct HTTPLogRecord<'r> {
