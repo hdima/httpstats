@@ -28,6 +28,7 @@ pub fn format_duration(duration: uint) -> ~str {
     int_part + fract_part + modifier
 }
 
+// FIXME: Can we replace it with std::num::pow?
 fn pow(n: uint, p: uint) -> uint {
     let mut num = 1;
     for _ in range(0, p) {
