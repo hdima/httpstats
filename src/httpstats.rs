@@ -13,6 +13,8 @@ mod log;
 mod stats;
 
 
+static NUMBER_OF_ITEMS_TO_PRINT: uint = 10u;
+
 fn parse(filenames: &[~str]) {
     let files = filenames.iter().map(|filename| {
         let path = Path::new(filename.clone());
@@ -24,7 +26,7 @@ fn parse(filenames: &[~str]) {
     let mut parser = NginxLogParser::new(reader);
     parser.parse(stats);
     let printer = LogStatsPrinter::new(stats);
-    printer.print();
+    printer.print(NUMBER_OF_ITEMS_TO_PRINT);
 }
 
 fn main() {

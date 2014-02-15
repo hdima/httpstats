@@ -7,4 +7,5 @@
 - Should we decode path? For example /" will be replaced with /\x22 in the log
 - What should we do with empty fields which marked as "-" in the log? Should
   they be converted to an empty string or should we use Option instead?
+- Configure items limit from command line?
 - Comments
