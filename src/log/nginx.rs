@@ -22,6 +22,7 @@ impl<R: Buffer> NginxLogParser<R> {
     }
 }
 
+#[inline]
 fn create_log_record<'r>(line: &'r str) -> HTTPLogRecord<'r> {
     let (remote_addr, mut tail) = get_field(line);
     // User
@@ -50,6 +51,7 @@ fn create_log_record<'r>(line: &'r str) -> HTTPLogRecord<'r> {
         }
 }
 
+#[inline]
 fn get_field<'a>(line: &'a str) -> (&'a str, &'a str) {
     let slice = line.trim_left();
     match slice.find(' ') {
@@ -60,6 +62,7 @@ fn get_field<'a>(line: &'a str) -> (&'a str, &'a str) {
     }
 }
 
+#[inline]
 fn get_field_or<'a>(line: &'a str, default: &'a str) -> (&'a str, &'a str) {
     let slice = line.trim_left();
     match slice.find(' ') {
@@ -70,6 +73,7 @@ fn get_field_or<'a>(line: &'a str, default: &'a str) -> (&'a str, &'a str) {
     }
 }
 
+#[inline]
 fn skip_field<'a>(line: &'a str) -> &'a str {
     let slice = line.trim_left();
     match slice.find(' ') {
@@ -78,6 +82,7 @@ fn skip_field<'a>(line: &'a str) -> &'a str {
     }
 }
 
+#[inline]
 fn get_delimited_field<'a>(line: &'a str, start: char, end: char) ->
         (&'a str, &'a str) {
     let mut slice = line.trim_left();
@@ -96,6 +101,7 @@ fn get_delimited_field<'a>(line: &'a str, start: char, end: char) ->
     }
 }
 
+#[inline]
 fn get_local_time<'a>(line: &'a str) -> (Tm, &'a str) {
     let (slice, tail) = get_delimited_field(line, '[', ']');
     match strptime(slice, "%d/%b/%Y:%H:%M:%S %z") {
@@ -104,6 +110,7 @@ fn get_local_time<'a>(line: &'a str) -> (Tm, &'a str) {
     }
 }
 
+#[inline]
 fn get_request_time<'a>(line: &'a str) -> (uint, &'a str) {
     let (slice, tail) = get_field(line);
     match slice.find('.') {
@@ -116,6 +123,7 @@ fn get_request_time<'a>(line: &'a str) -> (uint, &'a str) {
     }
 }
 
+#[inline]
 fn get_method_path<'a>(line: &'a str) -> (&'a str, &'a str, &'a str) {
     let (slice, tail) = get_delimited_field(line, '"', '"');
     let (method, req_tail) = get_field_or(slice, "");
@@ -123,6 +131,7 @@ fn get_method_path<'a>(line: &'a str) -> (&'a str, &'a str, &'a str) {
     (method, path, tail)
 }
 
+#[inline]
 fn get_int<'a>(line: &'a str) -> (uint, &'a str) {
     let (slice, tail) = get_field(line);
     (from_str(slice).unwrap(), tail)

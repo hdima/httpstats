@@ -1,6 +1,6 @@
 use std::fmt::Default;
 
-use super::{LogStats, StatsItem, StatsMap};
+use super::{LogStats, StatsItem, StatsMap, ObjectStats};
 use super::utils::{format_duration, format_bytes};
 
 
@@ -14,6 +14,7 @@ impl<'r> LogStatsPrinter<'r> {
     }
 
     pub fn print(&self, limit: uint) {
+        print_totals(&self.stats.total);
         print(&self.stats.clients, "by requests", "Clients", limit);
         print(&self.stats.paths, "by requests", "Paths", limit);
         print(&self.stats.methods, "by requests", "Methods", limit);
@@ -23,6 +24,19 @@ impl<'r> LogStatsPrinter<'r> {
     }
 }
 
+#[inline]
+fn print_totals(totals: &ObjectStats) {
+    println!("Totals\n\
+              =======================\n\
+              Requests Duration Bytes\n\
+              -----------------------");
+    println!("{: >8} {: >8} {: >5}",
+             totals.requests,
+             format_duration(totals.request_time),
+             format_bytes(totals.sent_bytes));
+}
+
+#[inline]
 fn print<T: IterBytes + Eq + Default>(mapping: &StatsMap<T>, title: &str,
         key_title: &str, limit: uint) {
     let mut items: ~[StatsItem<T>] = mapping.iter().collect();
@@ -30,14 +44,16 @@ fn print<T: IterBytes + Eq + Default>(mapping: &StatsMap<T>, title: &str,
     print_sorted(items, title, key_title, limit);
 }
 
+#[inline]
 fn print_sorted<T: IterBytes + Eq + Default>(sorted: &[StatsItem<T>],
         title: &str, key_title: &str, limit: uint) {
-    println!("\n{} {}", key_title, title);
-    println!("=====================================================\
-              ============================");
-    println!("{: <57} Requests Duration Bytes", key_title);
-    println!("-----------------------------------------------------\
-              ----------------------------");
+    println!("\n{} {}\n\
+              =====================================================\
+              ============================\n\
+              {: <57} Requests Duration Bytes\n\
+              -----------------------------------------------------\
+              ----------------------------\n",
+              key_title, title, key_title);
     for &(client, stats) in sorted.iter().take(limit) {
         println!("{: <60.60} {: >5} {: >8} {: >5}",
                  *client,
