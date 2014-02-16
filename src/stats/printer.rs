@@ -15,14 +15,15 @@ impl<'r> LogStatsPrinter<'r> {
 
     pub fn print(&self, limit: uint) {
         print_totals(&self.stats.total);
-        print(&self.stats.hosts, "by requests", "Hosts", limit);
-        print(&self.stats.clients, "by requests", "Clients", limit);
-        print(&self.stats.hours, "by requests", "Hours", limit);
-        print(&self.stats.paths, "by requests", "Paths", limit);
-        print(&self.stats.methods, "by requests", "Methods", limit);
-        print(&self.stats.statuses, "by requests", "Statuses", limit);
-        print(&self.stats.referers, "by requests", "Referers", limit);
-        print(&self.stats.user_agents, "by requests", "User agents", limit);
+        print(&self.stats.hosts, "Requests", "Hosts", limit);
+        print(&self.stats.dates, "Requests", "Dates", limit);
+        print(&self.stats.clients, "Requests", "Clients", limit);
+        print(&self.stats.hours, "Requests", "Hours", limit);
+        print(&self.stats.paths, "Requests", "Paths", limit);
+        print(&self.stats.methods, "Requests", "Methods", limit);
+        print(&self.stats.statuses, "Requests", "Statuses", limit);
+        print(&self.stats.referers, "Requests", "Referers", limit);
+        print(&self.stats.user_agents, "Requests", "User agents", limit);
     }
 }
 
@@ -49,13 +50,13 @@ fn print<T: IterBytes + Eq + Default>(mapping: &StatsMap<T>, title: &str,
 #[inline]
 fn print_sorted<T: IterBytes + Eq + Default>(sorted: &[StatsItem<T>],
         title: &str, key_title: &str, limit: uint) {
-    println!("\n{} {}\n\
+    println!("\n{} by {}\n\
               =====================================================\
               ============================\n\
               {: <57} Requests Duration Bytes\n\
               -----------------------------------------------------\
               ----------------------------",
-              key_title, title, key_title);
+              title, key_title, key_title);
     for &(client, stats) in sorted.iter().take(limit) {
         println!("{: <60.60} {: >5} {: >8} {: >5}",
                  *client,

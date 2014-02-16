@@ -25,6 +25,7 @@ pub struct LogStats {
     priv referers: StatsMap<~str>,
     priv user_agents: StatsMap<~str>,
     priv hours: StatsMap<u8>,
+    priv dates: StatsMap<~str>,
 }
 
 impl LogStats {
@@ -43,6 +44,7 @@ impl LogStats {
             referers: HashMap::new(),
             user_agents: HashMap::new(),
             hours: HashMap::new(),
+            dates: HashMap::new(),
             }
     }
 }
@@ -59,6 +61,8 @@ impl LogProcessor for LogStats {
         update(&mut self.referers, record.referer.into_owned(), &record);
         update(&mut self.user_agents, record.user_agent.into_owned(), &record);
         update(&mut self.hours, record.local_time.tm_hour as u8, &record);
+        update(&mut self.dates, record.local_time.strftime("%Y-%m-%d"),
+            &record);
     }
 }
 
