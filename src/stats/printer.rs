@@ -17,6 +17,7 @@ impl<'r> LogStatsPrinter<'r> {
         print_totals(&self.stats.total);
         print(&self.stats.hosts, "by requests", "Hosts", limit);
         print(&self.stats.clients, "by requests", "Clients", limit);
+        print(&self.stats.hours, "by requests", "Hours", limit);
         print(&self.stats.paths, "by requests", "Paths", limit);
         print(&self.stats.methods, "by requests", "Methods", limit);
         print(&self.stats.statuses, "by requests", "Statuses", limit);
