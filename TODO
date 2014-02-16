@@ -1,4 +1,5 @@
 - Support for .gz
+- Display percentage for all values?
 - Parse log based on arguments passed to the constructor
 - Print filename (and line?) for log parsing errors? Probably not easy since
   we use merged reader.
@@ -13,5 +14,4 @@ Maybe
 =====
 
 - Support for '-' filename for STDIN?
-- Calculate total statistics and display percentage for all values?
 - We can also calculate connection speed based on size and time
