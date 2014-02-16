@@ -50,13 +50,13 @@ fn print<T: IterBytes + Eq + Default>(mapping: &StatsMap<T>, title: &str,
 #[inline]
 fn print_sorted<T: IterBytes + Eq + Default>(sorted: &[StatsItem<T>],
         title: &str, key_title: &str, limit: uint) {
-    println!("\n{} by {}\n\
+    println!("\n{} by {} (top {})\n\
               =====================================================\
               ============================\n\
               {: <57} Requests Duration Bytes\n\
               -----------------------------------------------------\
               ----------------------------",
-              title, key_title, key_title);
+              title, key_title, limit, key_title);
     for &(client, stats) in sorted.iter().take(limit) {
         println!("{: <60.60} {: >5} {: >8} {: >5}",
                  *client,
