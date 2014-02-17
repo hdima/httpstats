@@ -1,3 +1,6 @@
+- Print descriptions for HTTP statuses
+- Maybe print top of pages for other statuses then 200?
+- Print clients by response time and response size?
 - Support for .gz
 - Display percentage for all values?
 - Parse log based on arguments passed to the constructor
