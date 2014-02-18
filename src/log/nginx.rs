@@ -2,7 +2,7 @@ use std::io::Buffer;
 
 use extra::time::{Tm, strptime};
 
-use super::{HTTPLogRecord, LogProcessor};
+use super::{HTTPLogRecord, LogProcessor, HTTPStatus};
 
 
 pub struct NginxLogParser<B> {
@@ -44,7 +44,7 @@ fn create_log_record<'r>(line: &'r str) -> HTTPLogRecord<'r> {
         request_time: request_time,
         method: method,
         path: path,
-        status: status as u16,
+        status: HTTPStatus{status: status as u16},
         sent_bytes: sent_bytes as uint,
         referer: referer,
         user_agent: user_agent,

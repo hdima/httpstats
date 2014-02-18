@@ -1,4 +1,5 @@
-- Print descriptions for HTTP statuses
+- Configure text width through the command line options? Also we can try to
+  guess the width for the terminal
 - Maybe print top of pages for other statuses then 200?
 - Print clients by response time and response size?
 - Support for .gz

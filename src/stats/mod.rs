@@ -1,6 +1,6 @@
 use std::hashmap::HashMap;
 
-use log::{HTTPLogRecord, LogProcessor};
+use log::{HTTPLogRecord, LogProcessor, HTTPStatus};
 
 pub mod printer;
 mod utils;
@@ -21,7 +21,7 @@ pub struct LogStats {
     priv hosts: StatsMap<~str>,
     priv methods: StatsMap<~str>,
     priv paths: StatsMap<~str>,
-    priv statuses: StatsMap<u16>,
+    priv statuses: StatsMap<HTTPStatus>,
     priv referers: StatsMap<~str>,
     priv user_agents: StatsMap<~str>,
     priv hours: StatsMap<u8>,
