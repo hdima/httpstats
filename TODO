@@ -2,7 +2,6 @@
   guess the width for the terminal
 - Maybe print top of pages for other statuses then 200?
 - Print clients by response time and response size?
-- Support for .gz
 - Display percentage for all values?
 - Parse log based on arguments passed to the constructor
 - Print filename (and line?) for log parsing errors? Probably not easy since
