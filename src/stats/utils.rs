@@ -41,7 +41,7 @@ pub fn format_bytes(mut bytes: u64) -> ~str {
     static modifiers: [&'static str, ..5] = ["T", "G", "M", "K", ""];
     let mut i = modifiers.len() - 1;
     while bytes >= 1024 && i != 0 {
-        bytes /= 1024;
+        bytes = (bytes / 1024) + (bytes % 1024) / 513;
         i -= 1;
     }
     bytes.to_str() + modifiers[i]
@@ -51,7 +51,7 @@ pub fn format_number(mut bytes: u64) -> ~str {
     static modifiers: [&'static str, ..5] = ["T", "G", "M", "K", ""];
     let mut i = modifiers.len() - 1;
     while bytes >= 1000 && i != 0 {
-        bytes /= 1000;
+        bytes = (bytes / 1000) + (bytes % 1000) / 501;
         i -= 1;
     }
     bytes.to_str() + modifiers[i]
@@ -93,6 +93,8 @@ mod test {
         assert_eq!(~"1K", format_bytes(1024));
         assert_eq!(~"2K", format_bytes(2048));
         assert_eq!(~"4K", format_bytes(4096));
+        assert_eq!(~"4K", format_bytes(4608));
+        assert_eq!(~"5K", format_bytes(4609));
         assert_eq!(~"1M", format_bytes(1024 * 1024));
         assert_eq!(~"1G", format_bytes(1024 * 1024 * 1024));
         assert_eq!(~"1T", format_bytes(1024 * 1024 * 1024 * 1024));
@@ -108,6 +110,8 @@ mod test {
         assert_eq!(~"1K", format_number(1000));
         assert_eq!(~"2K", format_number(2000));
         assert_eq!(~"4K", format_number(4000));
+        assert_eq!(~"4K", format_number(4500));
+        assert_eq!(~"5K", format_number(4501));
         assert_eq!(~"1M", format_number(1000 * 1000));
         assert_eq!(~"1G", format_number(1000 * 1000 * 1000));
         assert_eq!(~"1T", format_number(1000 * 1000 * 1000 * 1000));

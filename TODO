@@ -1,5 +1,4 @@
-- We should round values for format_bytes/format_number or display also
-  fractional part
+- Add days for duration display?
 - Display period of time for the statistic
 - Configure text width through the command line options? Also we can try to
   guess the width for the terminal
