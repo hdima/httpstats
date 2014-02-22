@@ -1,4 +1,3 @@
-- Add days for duration display?
 - Display period of time for the statistic
 - Configure text width through the command line options? Also we can try to
   guess the width for the terminal

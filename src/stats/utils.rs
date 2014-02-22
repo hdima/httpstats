@@ -7,9 +7,11 @@ pub fn format_duration(duration: u64) -> ~str {
         } else if duration < 60 * 1000 {
             (duration / 100, 1, ~"s")
         } else if duration < 60 * 60 * 1000 {
-            (duration / 6000, 1, ~"m")
+            (duration / (60 * 100), 1, ~"m")
+        } else if duration < 24 * 60 * 60 * 1000 {
+            (duration / (60 * 60 * 100), 1, ~"h")
         } else {
-            (duration / 360000, 1, ~"h")
+            (duration / (24 * 60 * 60 * 100), 1, ~"d")
         };
     while pos > 0 && n % 10 == 0 {
         n /= 10;
@@ -81,6 +83,8 @@ mod test {
         assert_eq!(~"1h", format_duration(60 * 60 * 1000));
         assert_eq!(~"1.5h", format_duration(90 * 60 * 1000));
         assert_eq!(~"10h", format_duration(10 * 60 * 60 * 1000));
+        assert_eq!(~"1d", format_duration(24 * 60 * 60 * 1000));
+        assert_eq!(~"1.5d", format_duration(36 * 60 * 60 * 1000));
     }
 
     #[test]
