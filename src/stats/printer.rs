@@ -1,7 +1,7 @@
 use std::fmt::Default;
 
 use super::{LogStats, StatsItem, StatsMap, ObjectStats};
-use super::utils::{format_duration, format_bytes};
+use super::utils::{format_duration, format_bytes, format_number};
 
 
 pub struct LogStatsPrinter<'r> {
@@ -34,7 +34,7 @@ fn print_totals(totals: &ObjectStats) {
               Requests Duration Bytes\n\
               -----------------------");
     println!("{: >8} {: >8} {: >5}",
-             totals.requests,
+             format_number(totals.requests),
              format_duration(totals.request_time),
              format_bytes(totals.sent_bytes));
 }
@@ -60,7 +60,7 @@ fn print_sorted<T: IterBytes + Eq + Default>(sorted: &[StatsItem<T>],
     for &(client, stats) in sorted.iter().take(limit) {
         println!("{: <60.60} {: >5} {: >8} {: >5}",
                  *client,
-                 stats.requests,
+                 format_number(stats.requests),
                  format_duration(stats.request_time),
                  format_bytes(stats.sent_bytes));
     }

@@ -45,7 +45,7 @@ fn create_log_record<'r>(line: &'r str) -> HTTPLogRecord<'r> {
         method: method,
         path: path,
         status: HTTPStatus{status: status as u16},
-        sent_bytes: sent_bytes as uint,
+        sent_bytes: sent_bytes,
         referer: referer,
         user_agent: user_agent,
         }
@@ -111,13 +111,13 @@ fn get_local_time<'a>(line: &'a str) -> (Tm, &'a str) {
 }
 
 #[inline]
-fn get_request_time<'a>(line: &'a str) -> (uint, &'a str) {
+fn get_request_time<'a>(line: &'a str) -> (u64, &'a str) {
     let (slice, tail) = get_field(line);
     match slice.find('.') {
         Some(pos) => {
-            let sec: int = from_str(slice.slice_to(pos)).unwrap();
-            let msec: int = from_str(slice.slice_from(pos + 1)).unwrap();
-            ((sec * 1000 + msec) as uint, tail)
+            let sec: u64 = from_str(slice.slice_to(pos)).unwrap();
+            let msec: u64 = from_str(slice.slice_from(pos + 1)).unwrap();
+            (sec * 1000 + msec, tail)
         }
         None => fail!("invalid request time: {}", line)
     }
@@ -132,7 +132,7 @@ fn get_method_path<'a>(line: &'a str) -> (&'a str, &'a str, &'a str) {
 }
 
 #[inline]
-fn get_int<'a>(line: &'a str) -> (uint, &'a str) {
+fn get_int<'a>(line: &'a str) -> (u64, &'a str) {
     let (slice, tail) = get_field(line);
     (from_str(slice).unwrap(), tail)
 }

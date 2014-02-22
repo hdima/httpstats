@@ -7,9 +7,9 @@ mod utils;
 
 
 struct ObjectStats {
-    requests: uint,
-    request_time: uint,
-    sent_bytes: uint
+    requests: u64,
+    request_time: u64,
+    sent_bytes: u64
 }
 
 type StatsItem<'r, T> = (&'r T, &'r ObjectStats);

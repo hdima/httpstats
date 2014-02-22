@@ -1,7 +1,7 @@
 use std::str;
 
 
-pub fn format_duration(duration: uint) -> ~str {
+pub fn format_duration(duration: u64) -> ~str {
     let (mut n, mut pos, modifier) = if duration < 1000 {
             (duration, 3, ~"s")
         } else if duration < 60 * 1000 {
@@ -16,7 +16,7 @@ pub fn format_duration(duration: uint) -> ~str {
         pos -= 1;
     }
     let int_part = (n / pow(10, pos)).to_str();
-    let mut fract_part = str::with_capacity(pos + 1);
+    let mut fract_part = str::with_capacity(pos as uint + 1);
     if pos != 0 && n != 0 {
         fract_part.push_char('.');
         while pos > 0 {
@@ -29,7 +29,7 @@ pub fn format_duration(duration: uint) -> ~str {
 }
 
 // FIXME: Can we replace it with std::num::pow?
-fn pow(n: uint, p: uint) -> uint {
+fn pow(n: u64, p: uint) -> u64 {
     let mut num = 1;
     for _ in range(0, p) {
         num *= n;
@@ -37,11 +37,21 @@ fn pow(n: uint, p: uint) -> uint {
     num
 }
 
-pub fn format_bytes(mut bytes: uint) -> ~str {
-    static modifiers: [&'static str, ..4] = ["G", "M", "K", ""];
+pub fn format_bytes(mut bytes: u64) -> ~str {
+    static modifiers: [&'static str, ..5] = ["T", "G", "M", "K", ""];
     let mut i = modifiers.len() - 1;
     while bytes >= 1024 && i != 0 {
         bytes /= 1024;
+        i -= 1;
+    }
+    bytes.to_str() + modifiers[i]
+}
+
+pub fn format_number(mut bytes: u64) -> ~str {
+    static modifiers: [&'static str, ..5] = ["T", "G", "M", "K", ""];
+    let mut i = modifiers.len() - 1;
+    while bytes >= 1000 && i != 0 {
+        bytes /= 1000;
         i -= 1;
     }
     bytes.to_str() + modifiers[i]
@@ -52,7 +62,7 @@ pub fn format_bytes(mut bytes: uint) -> ~str {
  */
 #[cfg(test)]
 mod test {
-    use super::{format_duration, format_bytes};
+    use super::{format_duration, format_bytes, format_number};
 
     #[test]
     fn test_format_duration() {
@@ -85,6 +95,22 @@ mod test {
         assert_eq!(~"4K", format_bytes(4096));
         assert_eq!(~"1M", format_bytes(1024 * 1024));
         assert_eq!(~"1G", format_bytes(1024 * 1024 * 1024));
-        assert_eq!(~"1024G", format_bytes(1024 * 1024 * 1024 * 1024));
+        assert_eq!(~"1T", format_bytes(1024 * 1024 * 1024 * 1024));
+        assert_eq!(~"1024T", format_bytes(1024 * 1024 * 1024 * 1024 * 1024));
+    }
+
+    #[test]
+    fn test_format_number() {
+        assert_eq!(~"0", format_number(0));
+        assert_eq!(~"9", format_number(9));
+        assert_eq!(~"90", format_number(90));
+        assert_eq!(~"900", format_number(900));
+        assert_eq!(~"1K", format_number(1000));
+        assert_eq!(~"2K", format_number(2000));
+        assert_eq!(~"4K", format_number(4000));
+        assert_eq!(~"1M", format_number(1000 * 1000));
+        assert_eq!(~"1G", format_number(1000 * 1000 * 1000));
+        assert_eq!(~"1T", format_number(1000 * 1000 * 1000 * 1000));
+        assert_eq!(~"1000T", format_number(1000 * 1000 * 1000 * 1000 * 1000));
     }
 }

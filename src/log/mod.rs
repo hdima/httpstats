@@ -27,11 +27,11 @@ pub struct HTTPLogRecord<'r> {
     local_time: Tm,
     host: &'r str,
     // Request time in milliseconds
-    request_time: uint,
+    request_time: u64,
     method: &'r str,
     path: &'r str,
     status: HTTPStatus,
-    sent_bytes: uint,
+    sent_bytes: u64,
     referer: &'r str,
     user_agent: &'r str,
 }
