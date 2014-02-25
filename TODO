@@ -1,5 +1,4 @@
 - Display statistics for some strange cases like unknown HTTP methods etc.?
-- Display period of time for the statistic
 - Configure text width through the command line options? Also we can try to
   guess the width for the terminal
 - Maybe print top of pages for other statuses then 200?

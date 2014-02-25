@@ -1,5 +1,7 @@
 use std::fmt::Default;
 
+use extra::time::Tm;
+
 use super::{LogStats, StatsItem, StatsMap, ObjectStats};
 use super::utils::{format_duration, format_bytes, format_number};
 
@@ -14,7 +16,7 @@ impl<'r> LogStatsPrinter<'r> {
     }
 
     pub fn print(&self, limit: uint) {
-        print_totals(&self.stats.total);
+        print_totals(&self.stats.total, &self.stats.start, &self.stats.end);
         print(&self.stats.hosts, "Requests", "Hosts", limit);
         print(&self.stats.dates, "Requests", "Dates", limit);
         print(&self.stats.clients, "Requests", "Clients", limit);
@@ -28,12 +30,26 @@ impl<'r> LogStatsPrinter<'r> {
 }
 
 #[inline]
-fn print_totals(totals: &ObjectStats) {
+fn print_totals(totals: &ObjectStats, start: &Option<Tm>, end: &Option<Tm>) {
+    let start_date = match *start {
+        None => ~"-",
+        Some(ref s) => s.strftime("%Y-%m-%d")
+    };
+    let end_date = match *end {
+        None => ~"-",
+        Some(ref e) => e.strftime("%Y-%m-%d")
+    };
     println!("Totals\n\
-              =======================\n\
+              =====================================================\
+              ============================\n\
+              Period                                                    \
               Requests Duration Bytes\n\
-              -----------------------");
-    println!("{: >8} {: >8} {: >5}",
+              -----------------------------------------------------\
+              ----------------------------");
+    println!("{: <10} - {: >10}                                   \
+              {: >8} {: >8} {: >5}",
+             start_date,
+             end_date,
              format_number(totals.requests),
              format_duration(totals.request_time),
              format_bytes(totals.sent_bytes));

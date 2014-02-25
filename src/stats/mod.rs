@@ -1,5 +1,7 @@
 use std::hashmap::HashMap;
 
+use extra::time::{Tm, Timespec};
+
 use log::{HTTPLogRecord, LogProcessor, HTTPStatus};
 
 pub mod printer;
@@ -16,6 +18,10 @@ type StatsItem<'r, T> = (&'r T, &'r ObjectStats);
 type StatsMap<T> = HashMap<T, ObjectStats>;
 
 pub struct LogStats {
+    priv start: Option<Tm>,
+    priv end: Option<Tm>,
+    priv start_sec: Option<Timespec>,
+    priv end_sec: Option<Timespec>,
     priv total: ObjectStats,
     priv clients: StatsMap<~str>,
     priv hosts: StatsMap<~str>,
@@ -31,6 +37,10 @@ pub struct LogStats {
 impl LogStats {
     pub fn new() -> ~LogStats {
         ~LogStats{
+            start: None,
+            end: None,
+            start_sec: None,
+            end_sec: None,
             total: ObjectStats{
                 requests: 0,
                 request_time: 0,
@@ -52,6 +62,7 @@ impl LogStats {
 impl LogProcessor for LogStats {
     #[inline]
     fn process(&mut self, record: HTTPLogRecord) {
+        update_interval(self, &record.local_time);
         update_totals(&mut self.total, &record);
         update(&mut self.clients, record.remote_addr.into_owned(), &record);
         update(&mut self.hosts, record.host.into_owned(), &record);
@@ -63,6 +74,35 @@ impl LogProcessor for LogStats {
         update(&mut self.hours, record.local_time.tm_hour as u8, &record);
         update(&mut self.dates, record.local_time.strftime("%Y-%m-%d"),
             &record);
+    }
+}
+
+#[inline]
+fn update_interval(stats: &mut LogStats, current: &Tm) {
+    let timespec = current.to_utc().to_timespec();
+    match stats.start_sec {
+        None => {
+            stats.start_sec = Some(timespec);
+            stats.start = Some(current.clone());
+        }
+        Some(start_sec) => {
+            if start_sec > timespec {
+                stats.start_sec = Some(timespec);
+                stats.start = Some(current.clone());
+            }
+        }
+    }
+    match stats.end_sec {
+        None => {
+            stats.end_sec = Some(timespec);
+            stats.end = Some(current.clone());
+        }
+        Some(end_sec) => {
+            if end_sec < timespec {
+                stats.end_sec = Some(timespec);
+                stats.end = Some(current.clone());
+            }
+        }
     }
 }
 
