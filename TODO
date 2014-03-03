@@ -1,3 +1,6 @@
+- Create proper URLs by adding domain to paths in the request by paths list
+    - Probably we also need to store if request is HTTP or HTTPS to create
+      proper URLs?
 - Display statistics for some strange cases like unknown HTTP methods etc.?
 - Configure text width through the command line options? Also we can try to
   guess the width for the terminal
