@@ -4,7 +4,7 @@
 - Display statistics for some strange cases like unknown HTTP methods etc.?
 - Configure text width through the command line options? Also we can try to
   guess the width for the terminal
-- Maybe print top of pages for other statuses then 200?
+- Maybe print top of pages for other statuses than 200?
 - Print clients by response time and response size?
 - Display percentage for all values?
 - Parse log based on arguments passed to the constructor
