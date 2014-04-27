@@ -1,6 +1,7 @@
-use std::fmt::Default;
+use std::fmt::Show;
+use std::hash::Hash;
 
-use extra::time::Tm;
+use time::Tm;
 
 use super::{LogStats, StatsItem, StatsMap, ObjectStats};
 use super::utils::{format_duration, format_bytes, format_number};
@@ -56,7 +57,7 @@ fn print_totals(totals: &ObjectStats, start: &Option<Tm>, end: &Option<Tm>) {
 }
 
 #[inline]
-fn print<T: IterBytes + Eq + Default>(mapping: &StatsMap<T>, title: &str,
+fn print<T: TotalEq + Hash + Show>(mapping: &StatsMap<T>, title: &str,
         key_title: &str, limit: uint) {
     let mut items: ~[StatsItem<T>] = mapping.iter().collect();
     items.sort_by(|&(_, a), &(_, b)| b.requests.cmp(&a.requests));
@@ -64,7 +65,7 @@ fn print<T: IterBytes + Eq + Default>(mapping: &StatsMap<T>, title: &str,
 }
 
 #[inline]
-fn print_sorted<T: IterBytes + Eq + Default>(sorted: &[StatsItem<T>],
+fn print_sorted<T: Eq + Show>(sorted: &[StatsItem<T>],
         title: &str, key_title: &str, limit: uint) {
     println!("\n{} by {} (top {})\n\
               =====================================================\

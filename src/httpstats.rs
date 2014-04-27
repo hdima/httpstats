@@ -1,8 +1,9 @@
-extern mod extra;
+extern crate time;
+extern crate collections;
 
 use std::os;
 use std::io::util::ChainedReader;
-use std::io::buffered::BufferedReader;
+use std::io::BufferedReader;
 
 use stats::LogStats;
 use stats::printer::LogStatsPrinter;

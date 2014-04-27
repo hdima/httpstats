@@ -1,6 +1,7 @@
-use std::fmt::{Default, Formatter};
+use std::fmt::{Show, Formatter, Result};
+use std::hash::Hash;
 
-use extra::time::Tm;
+use time::Tm;
 
 use self::utils::http_status_description;
 
@@ -8,16 +9,15 @@ pub mod nginx;
 mod utils;
 
 
-#[deriving(Eq)]
-#[deriving(IterBytes)]
+#[deriving(Eq, Hash, TotalEq)]
 pub struct HTTPStatus {
     status: u16,
 }
 
-impl Default for HTTPStatus {
-    fn fmt(status: &HTTPStatus, f: &mut Formatter) {
-        let desc = http_status_description(status.status);
-        f.pad(status.status.to_str() + " " + desc);
+impl Show for HTTPStatus {
+    fn fmt(&self, f: &mut Formatter) -> Result {
+        let desc = http_status_description(self.status);
+        f.pad(self.status.to_str() + " " + desc)
     }
 }
 

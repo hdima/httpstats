@@ -18,7 +18,7 @@ And then run it in the following way::
 Limitations
 -----------
 
-- Now only `Rust 0.9 <https://github.com/mozilla/rust/wiki/Doc-releases>`_ is
+- Now only `Rust 0.10 <https://github.com/mozilla/rust/wiki/Doc-releases>`_ is
   supported
 - Now ``httpstats`` only parse `Nginx <http://nginx.org/>`_ logs with the
   following format::

@@ -1,6 +1,8 @@
-use std::hashmap::HashMap;
+use std::hash::Hash;
 
-use extra::time::{Tm, Timespec};
+use collections::hashmap::HashMap;
+
+use time::{Tm, Timespec};
 
 use log::{HTTPLogRecord, LogProcessor, HTTPStatus};
 
@@ -114,7 +116,7 @@ fn update_totals(totals: &mut ObjectStats,  record: &HTTPLogRecord) {
 }
 
 #[inline]
-fn update<T: IterBytes + Eq>(mapping: &mut StatsMap<T>, key: T,
+fn update<T: TotalEq + Hash>(mapping: &mut StatsMap<T>, key: T,
         record: &HTTPLogRecord) {
     mapping.insert_or_update_with(
         key,

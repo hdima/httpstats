@@ -1,3 +1,4 @@
+- Proper error reporting for GzipReader
 - Create proper URLs by adding domain to paths in the request by paths list
     - Probably we also need to store if request is HTTP or HTTPS to create
       proper URLs?
