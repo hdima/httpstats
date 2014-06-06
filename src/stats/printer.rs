@@ -20,6 +20,7 @@ impl<'r> LogStatsPrinter<'r> {
         print_totals(&self.stats.total, &self.stats.start, &self.stats.end);
         print(&self.stats.hosts, "Requests", "Hosts", limit);
         print(&self.stats.dates, "Requests", "Dates", limit);
+        print(&self.stats.users, "Requests", "Users", limit);
         print(&self.stats.clients, "Requests", "Clients", limit);
         print(&self.stats.hours, "Requests", "Hours", limit);
         print(&self.stats.paths, "Requests", "Paths", limit);

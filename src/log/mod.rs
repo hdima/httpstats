@@ -26,6 +26,7 @@ pub struct HTTPLogRecord<'r> {
     remote_addr: &'r str,
     local_time: Tm,
     host: &'r str,
+    user: &'r str,
     // Request time in milliseconds
     request_time: u64,
     method: &'r str,

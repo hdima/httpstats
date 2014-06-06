@@ -25,9 +25,8 @@ impl<R: Buffer> NginxLogParser<R> {
 
 #[inline]
 fn create_log_record<'r>(line: &'r str) -> HTTPLogRecord<'r> {
-    let (remote_addr, mut tail) = get_field(line);
-    // User
-    tail = skip_field(tail);
+    let (remote_addr, tail) = get_field(line);
+    let (user, tail) = get_field(tail);
     let (local_time, tail) = get_local_time(tail);
     let (host, mut tail) = get_field(tail);
     // Pipe
@@ -42,6 +41,7 @@ fn create_log_record<'r>(line: &'r str) -> HTTPLogRecord<'r> {
         remote_addr: remote_addr,
         local_time: local_time,
         host: host,
+        user: user,
         request_time: request_time,
         method: method,
         path: path,
