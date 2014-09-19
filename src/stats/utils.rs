@@ -1,24 +1,21 @@
-use std::str;
-
-
-pub fn format_duration(duration: u64) -> ~str {
+pub fn format_duration(duration: u64) -> String {
     let (mut n, mut pos, modifier) = if duration < 1000 {
-            (duration, 3, ~"s")
+            (duration, 3, "s")
         } else if duration < 60 * 1000 {
-            (duration / 100, 1, ~"s")
+            (duration / 100, 1, "s")
         } else if duration < 60 * 60 * 1000 {
-            (duration / (60 * 100), 1, ~"m")
+            (duration / (60 * 100), 1, "m")
         } else if duration < 24 * 60 * 60 * 1000 {
-            (duration / (60 * 60 * 100), 1, ~"h")
+            (duration / (60 * 60 * 100), 1, "h")
         } else {
-            (duration / (24 * 60 * 60 * 100), 1, ~"d")
+            (duration / (24 * 60 * 60 * 100), 1, "d")
         };
     while pos > 0 && n % 10 == 0 {
         n /= 10;
         pos -= 1;
     }
-    let int_part = (n / pow(10, pos)).to_str();
-    let mut fract_part = str::with_capacity(pos as uint + 1);
+    let int_part = (n / pow(10, pos)).to_string();
+    let mut fract_part = String::with_capacity(pos as uint + 1);
     if pos != 0 && n != 0 {
         fract_part.push_char('.');
         while pos > 0 {
@@ -39,24 +36,24 @@ fn pow(n: u64, p: uint) -> u64 {
     num
 }
 
-pub fn format_bytes(mut bytes: u64) -> ~str {
+pub fn format_bytes(mut bytes: u64) -> String {
     static modifiers: [&'static str, ..5] = ["T", "G", "M", "K", ""];
     let mut i = modifiers.len() - 1;
     while bytes >= 1024 && i != 0 {
         bytes = (bytes / 1024) + (bytes % 1024) / 513;
         i -= 1;
     }
-    bytes.to_str() + modifiers[i]
+    bytes.to_string() + modifiers[i]
 }
 
-pub fn format_number(mut bytes: u64) -> ~str {
+pub fn format_number(mut bytes: u64) -> String {
     static modifiers: [&'static str, ..5] = ["T", "G", "M", "K", ""];
     let mut i = modifiers.len() - 1;
     while bytes >= 1000 && i != 0 {
         bytes = (bytes / 1000) + (bytes % 1000) / 501;
         i -= 1;
     }
-    bytes.to_str() + modifiers[i]
+    bytes.to_string() + modifiers[i]
 }
 
 /*
@@ -66,59 +63,74 @@ pub fn format_number(mut bytes: u64) -> ~str {
 mod test {
     use super::{format_duration, format_bytes, format_number};
 
+    #[inline]
+    fn assert_duration(exp: &str, input: u64) {
+        assert_eq!(exp, format_duration(input).as_slice());
+    }
+
     #[test]
     fn test_format_duration() {
-        assert_eq!(~"0s", format_duration(0));
-        assert_eq!(~"0.009s", format_duration(9));
-        assert_eq!(~"0.09s", format_duration(90));
-        assert_eq!(~"0.9s", format_duration(900));
-        assert_eq!(~"0.999s", format_duration(999));
-        assert_eq!(~"1s", format_duration(1000));
-        assert_eq!(~"1s", format_duration(1009));
-        assert_eq!(~"1.4s", format_duration(1400));
-        assert_eq!(~"1.6s", format_duration(1600));
-        assert_eq!(~"59s", format_duration(59000));
-        assert_eq!(~"1m", format_duration(60000));
-        assert_eq!(~"1.5m", format_duration(90000));
-        assert_eq!(~"1h", format_duration(60 * 60 * 1000));
-        assert_eq!(~"1.5h", format_duration(90 * 60 * 1000));
-        assert_eq!(~"10h", format_duration(10 * 60 * 60 * 1000));
-        assert_eq!(~"1d", format_duration(24 * 60 * 60 * 1000));
-        assert_eq!(~"1.5d", format_duration(36 * 60 * 60 * 1000));
+        assert_duration("0s", 0);
+        assert_duration("0.009s", 9);
+        assert_duration("0.09s", 90);
+        assert_duration("0.9s", 900);
+        assert_duration("0.999s", 999);
+        assert_duration("1s", 1000);
+        assert_duration("1s", 1009);
+        assert_duration("1.4s", 1400);
+        assert_duration("1.6s", 1600);
+        assert_duration("59s", 59000);
+        assert_duration("1m", 60000);
+        assert_duration("1.5m", 90000);
+        assert_duration("1h", 60 * 60 * 1000);
+        assert_duration("1.5h", 90 * 60 * 1000);
+        assert_duration("10h", 10 * 60 * 60 * 1000);
+        assert_duration("1d", 24 * 60 * 60 * 1000);
+        assert_duration("1.5d", 36 * 60 * 60 * 1000);
+    }
+
+    #[inline]
+    fn assert_bytes(exp: &str, input: u64) {
+        assert_eq!(exp, format_bytes(input).as_slice());
     }
 
     #[test]
     fn test_format_bytes() {
-        assert_eq!(~"0", format_bytes(0));
-        assert_eq!(~"9", format_bytes(9));
-        assert_eq!(~"90", format_bytes(90));
-        assert_eq!(~"900", format_bytes(900));
-        assert_eq!(~"1000", format_bytes(1000));
-        assert_eq!(~"1K", format_bytes(1024));
-        assert_eq!(~"2K", format_bytes(2048));
-        assert_eq!(~"4K", format_bytes(4096));
-        assert_eq!(~"4K", format_bytes(4608));
-        assert_eq!(~"5K", format_bytes(4609));
-        assert_eq!(~"1M", format_bytes(1024 * 1024));
-        assert_eq!(~"1G", format_bytes(1024 * 1024 * 1024));
-        assert_eq!(~"1T", format_bytes(1024 * 1024 * 1024 * 1024));
-        assert_eq!(~"1024T", format_bytes(1024 * 1024 * 1024 * 1024 * 1024));
+        assert_bytes("0", 0);
+        assert_bytes("9", 9);
+        assert_bytes("90", 90);
+        assert_bytes("900", 900);
+        assert_bytes("1000", 1000);
+        assert_bytes("1K", 1024);
+        assert_bytes("2K", 2048);
+        assert_bytes("4K", 4096);
+        assert_bytes("4K", 4608);
+        assert_bytes("5K", 4609);
+        assert_bytes("1M", 1024 * 1024);
+        assert_bytes("1G", 1024 * 1024 * 1024);
+        assert_bytes("1T", 1024 * 1024 * 1024 * 1024);
+        assert_bytes("1024T", 1024 * 1024 * 1024 * 1024 * 1024);
+    }
+
+    #[inline]
+    fn assert_number(exp: &str, input: u64) {
+        assert_eq!(exp, format_number(input).as_slice());
     }
 
     #[test]
     fn test_format_number() {
-        assert_eq!(~"0", format_number(0));
-        assert_eq!(~"9", format_number(9));
-        assert_eq!(~"90", format_number(90));
-        assert_eq!(~"900", format_number(900));
-        assert_eq!(~"1K", format_number(1000));
-        assert_eq!(~"2K", format_number(2000));
-        assert_eq!(~"4K", format_number(4000));
-        assert_eq!(~"4K", format_number(4500));
-        assert_eq!(~"5K", format_number(4501));
-        assert_eq!(~"1M", format_number(1000 * 1000));
-        assert_eq!(~"1G", format_number(1000 * 1000 * 1000));
-        assert_eq!(~"1T", format_number(1000 * 1000 * 1000 * 1000));
-        assert_eq!(~"1000T", format_number(1000 * 1000 * 1000 * 1000 * 1000));
+        assert_number("0", 0);
+        assert_number("9", 9);
+        assert_number("90", 90);
+        assert_number("900", 900);
+        assert_number("1K", 1000);
+        assert_number("2K", 2000);
+        assert_number("4K", 4000);
+        assert_number("4K", 4500);
+        assert_number("5K", 4501);
+        assert_number("1M", 1000 * 1000);
+        assert_number("1G", 1000 * 1000 * 1000);
+        assert_number("1T", 1000 * 1000 * 1000 * 1000);
+        assert_number("1000T", 1000 * 1000 * 1000 * 1000 * 1000);
     }
 }

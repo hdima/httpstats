@@ -6,7 +6,7 @@ use super::{HTTPLogRecord, LogProcessor, HTTPStatus};
 
 
 pub struct NginxLogParser<B> {
-    priv buffer: B
+    buffer: B
 }
 
 impl<R: Buffer> NginxLogParser<R> {
@@ -17,7 +17,7 @@ impl<R: Buffer> NginxLogParser<R> {
     pub fn parse<P: LogProcessor>(&mut self, processor: &mut P) {
         for result in self.buffer.lines() {
             let line = result.unwrap();
-            let record = create_log_record(line);
+            let record = create_log_record(line.as_slice());
             processor.process(record);
         }
     }
@@ -70,7 +70,7 @@ fn get_field_or<'a>(line: &'a str, default: &'a str) -> (&'a str, &'a str) {
         Some(end) => {
             (slice.slice_to(end), slice.slice_from(end + 1))
         }
-        None => (default, &'a "")
+        None => (default, "")
     }
 }
 
@@ -87,7 +87,7 @@ fn skip_field<'a>(line: &'a str) -> &'a str {
 fn get_delimited_field<'a>(line: &'a str, start: char, end: char) ->
         (&'a str, &'a str) {
     let mut slice = line.trim_left();
-    if slice.len() < 1 || slice[0] != start as u8 {
+    if slice.len() < 1 || slice.char_at(0) != start {
         fail!("incomplete string: {}", line);
     } else {
         slice = slice.slice_from(1);

@@ -1,4 +1,5 @@
 extern crate time;
+extern crate libc;
 extern crate collections;
 
 use std::os;
@@ -17,7 +18,7 @@ mod gzreader;
 
 static NUMBER_OF_ITEMS_TO_PRINT: uint = 10u;
 
-fn parse(filenames: &[~str]) {
+fn parse(filenames: &[String]) {
     let files = filenames.iter().map(|filename| {
         let path = Path::new(filename.clone());
         GzipReader::open(&path).unwrap()
@@ -26,8 +27,8 @@ fn parse(filenames: &[~str]) {
     let reader = BufferedReader::new(file);
     let mut stats = LogStats::new();
     let mut parser = NginxLogParser::new(reader);
-    parser.parse(stats);
-    let printer = LogStatsPrinter::new(stats);
+    parser.parse(&mut stats);
+    let printer = LogStatsPrinter::new(&stats);
     printer.print(NUMBER_OF_ITEMS_TO_PRINT);
 }
 

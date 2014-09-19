@@ -3,21 +3,21 @@ use std::io::{Reader, IoResult, standard_error, EndOfFile, OtherIoError};
 use std::option::{Some, Option};
 //use std::c_str::CString;
 use std::os::last_os_error;
-use std::libc::types::os::arch::c95::{c_char, c_int, size_t};
+use libc::types::os::arch::c95::{c_char, c_int, size_t};
 
 
 enum GzFile {}
 
 #[link(name="z")]
 extern {
-    fn gzopen(filename: *c_char, mode: *c_char) -> *GzFile;
-    fn gzread(file: *GzFile, buf: *mut u8, len: size_t) -> c_int;
-    fn gzclose(file: *GzFile) -> c_int;
+    fn gzopen(filename: *const c_char, mode: *const c_char) -> *const GzFile;
+    fn gzread(file: *const GzFile, buf: *mut u8, len: size_t) -> c_int;
+    fn gzclose(file: *const GzFile) -> c_int;
     //fn gzerror(file: *GzFile, errnum: *c_int) -> *c_char;
 }
 
 pub struct GzipReader {
-    priv file: *GzFile,
+    file: *const GzFile,
 }
 
 impl GzipReader {

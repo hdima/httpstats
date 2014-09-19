@@ -8,7 +8,7 @@ use super::utils::{format_duration, format_bytes, format_number};
 
 
 pub struct LogStatsPrinter<'r> {
-    priv stats: &'r LogStats,
+    stats: &'r LogStats,
 }
 
 impl<'r> LogStatsPrinter<'r> {
@@ -33,12 +33,13 @@ impl<'r> LogStatsPrinter<'r> {
 
 #[inline]
 fn print_totals(totals: &ObjectStats, start: &Option<Tm>, end: &Option<Tm>) {
+    // FIXME: Too much .to_string()?
     let start_date = match *start {
-        None => ~"-",
+        None => "-".to_string(),
         Some(ref s) => s.strftime("%Y-%m-%d")
     };
     let end_date = match *end {
-        None => ~"-",
+        None => "-".to_string(),
         Some(ref e) => e.strftime("%Y-%m-%d")
     };
     println!("Totals\n\
@@ -58,15 +59,15 @@ fn print_totals(totals: &ObjectStats, start: &Option<Tm>, end: &Option<Tm>) {
 }
 
 #[inline]
-fn print<T: TotalEq + Hash + Show>(mapping: &StatsMap<T>, title: &str,
+fn print<T: Eq + Hash + Show>(mapping: &StatsMap<T>, title: &str,
         key_title: &str, limit: uint) {
-    let mut items: ~[StatsItem<T>] = mapping.iter().collect();
+    let mut items: Vec<StatsItem<T>> = mapping.iter().collect();
     items.sort_by(|&(_, a), &(_, b)| b.requests.cmp(&a.requests));
     print_sorted(items, title, key_title, limit);
 }
 
 #[inline]
-fn print_sorted<T: Eq + Show>(sorted: &[StatsItem<T>],
+fn print_sorted<T: Show>(sorted: Vec<StatsItem<T>>,
         title: &str, key_title: &str, limit: uint) {
     println!("\n{} by {} (top {})\n\
               =====================================================\

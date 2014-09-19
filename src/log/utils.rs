@@ -1,4 +1,4 @@
-pub fn http_status_description(status: u16) -> &str {
+pub fn http_status_description(status: u16) -> &'static str {
     match status {
         100 => "Continue",
         101 => "Switching Protocols",

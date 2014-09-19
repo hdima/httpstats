@@ -1,6 +1,6 @@
 use std::hash::Hash;
 
-use collections::hashmap::HashMap;
+use std::collections::HashMap;
 
 use time::{Tm, Timespec};
 
@@ -17,29 +17,30 @@ struct ObjectStats {
 }
 
 type StatsItem<'r, T> = (&'r T, &'r ObjectStats);
+// FIXME: Probably it should be Map to make it more generic
 type StatsMap<T> = HashMap<T, ObjectStats>;
 
 pub struct LogStats {
-    priv start: Option<Tm>,
-    priv end: Option<Tm>,
-    priv start_sec: Option<Timespec>,
-    priv end_sec: Option<Timespec>,
-    priv total: ObjectStats,
-    priv clients: StatsMap<~str>,
-    priv hosts: StatsMap<~str>,
-    priv methods: StatsMap<~str>,
-    priv paths: StatsMap<~str>,
-    priv statuses: StatsMap<HTTPStatus>,
-    priv referers: StatsMap<~str>,
-    priv user_agents: StatsMap<~str>,
-    priv hours: StatsMap<u8>,
-    priv dates: StatsMap<~str>,
-    priv users: StatsMap<~str>,
+    start: Option<Tm>,
+    end: Option<Tm>,
+    start_sec: Option<Timespec>,
+    end_sec: Option<Timespec>,
+    total: ObjectStats,
+    clients: StatsMap<String>,
+    hosts: StatsMap<String>,
+    methods: StatsMap<String>,
+    paths: StatsMap<String>,
+    statuses: StatsMap<HTTPStatus>,
+    referers: StatsMap<String>,
+    user_agents: StatsMap<String>,
+    hours: StatsMap<u8>,
+    dates: StatsMap<String>,
+    users: StatsMap<String>,
 }
 
 impl LogStats {
-    pub fn new() -> ~LogStats {
-        ~LogStats{
+    pub fn new() -> LogStats {
+        LogStats{
             start: None,
             end: None,
             start_sec: None,
@@ -68,17 +69,17 @@ impl LogProcessor for LogStats {
     fn process(&mut self, record: HTTPLogRecord) {
         update_interval(self, &record.local_time);
         update_totals(&mut self.total, &record);
-        update(&mut self.clients, record.remote_addr.into_owned(), &record);
-        update(&mut self.hosts, record.host.into_owned(), &record);
-        update(&mut self.methods, record.method.into_owned(), &record);
-        update(&mut self.paths, record.path.into_owned(), &record);
+        update(&mut self.clients, record.remote_addr.into_string(), &record);
+        update(&mut self.hosts, record.host.into_string(), &record);
+        update(&mut self.methods, record.method.into_string(), &record);
+        update(&mut self.paths, record.path.into_string(), &record);
         update(&mut self.statuses, record.status, &record);
-        update(&mut self.referers, record.referer.into_owned(), &record);
-        update(&mut self.user_agents, record.user_agent.into_owned(), &record);
+        update(&mut self.referers, record.referer.into_string(), &record);
+        update(&mut self.user_agents, record.user_agent.into_string(), &record);
         update(&mut self.hours, record.local_time.tm_hour as u8, &record);
         update(&mut self.dates, record.local_time.strftime("%Y-%m-%d"),
             &record);
-        update(&mut self.users, record.user.into_owned(), &record);
+        update(&mut self.users, record.user.into_string(), &record);
     }
 }
 
@@ -119,7 +120,7 @@ fn update_totals(totals: &mut ObjectStats,  record: &HTTPLogRecord) {
 }
 
 #[inline]
-fn update<T: TotalEq + Hash>(mapping: &mut StatsMap<T>, key: T,
+fn update<T: Eq + Hash>(mapping: &mut StatsMap<T>, key: T,
         record: &HTTPLogRecord) {
     mapping.insert_or_update_with(
         key,
