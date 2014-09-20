@@ -54,6 +54,7 @@ fn items_to_print(opt: Option<String>) -> Result<uint, String> {
 }
 
 fn main() {
+    // TODO: We can use an application object here with smaller methods
     let args = os::args();
     let program = args[0].clone();
     let opts = [
@@ -70,7 +71,8 @@ fn main() {
         match items_to_print(matches.opt_str("n")) {
             Ok(n) => parse(matches.free.as_slice(), n),
             Err(_str_n) => {
-                print_usage("Invalid number of items provided", program.as_slice(), opts);
+                print_usage("Invalid number of items provided",
+                            program.as_slice(), opts);
                 return;
             }
         }

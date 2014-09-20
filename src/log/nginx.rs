@@ -25,6 +25,8 @@ impl<R: Buffer> NginxLogParser<R> {
 
 #[inline]
 fn create_log_record<'r>(line: &'r str) -> HTTPLogRecord<'r> {
+    // TODO: Line parser can be implemented as iterator with a line
+    // specification as input
     let (remote_addr, tail) = get_field(line);
     let (user, tail) = get_field(tail);
     let (local_time, tail) = get_local_time(tail);
@@ -56,9 +58,7 @@ fn create_log_record<'r>(line: &'r str) -> HTTPLogRecord<'r> {
 fn get_field<'a>(line: &'a str) -> (&'a str, &'a str) {
     let slice = line.trim_left();
     match slice.find(' ') {
-        Some(end) => {
-            (slice.slice_to(end), slice.slice_from(end + 1))
-        }
+        Some(end) => (slice.slice_to(end), slice.slice_from(end + 1)),
         None => fail!("incomplete string: {}", line)
     }
 }
@@ -67,9 +67,7 @@ fn get_field<'a>(line: &'a str) -> (&'a str, &'a str) {
 fn get_field_or<'a>(line: &'a str, default: &'a str) -> (&'a str, &'a str) {
     let slice = line.trim_left();
     match slice.find(' ') {
-        Some(end) => {
-            (slice.slice_to(end), slice.slice_from(end + 1))
-        }
+        Some(end) => (slice.slice_to(end), slice.slice_from(end + 1)),
         None => (default, "")
     }
 }
@@ -84,21 +82,17 @@ fn skip_field<'a>(line: &'a str) -> &'a str {
 }
 
 #[inline]
-fn get_delimited_field<'a>(line: &'a str, start: char, end: char) ->
+fn get_delimited_field<'a>(line: &'a str, start_c: char, end_c: char) ->
         (&'a str, &'a str) {
-    let mut slice = line.trim_left();
-    if slice.len() < 1 || slice.char_at(0) != start {
-        fail!("incomplete string: {}", line);
-    } else {
-        slice = slice.slice_from(1);
-        // FIXME: Should we skip escaped end characters? But probably not so
-        // important in this case
-        match slice.find(end) {
-            Some(end) => {
-                (slice.slice_to(end), slice.slice_from(end + 1))
-            }
-            None => fail!("incomplete string: {}", line)
-        }
+    match line.trim_left().slice_shift_char() {
+        (Some(c), slice) if c == start_c =>
+            // FIXME: Should we skip escaped end characters? But probably
+            // not so important in this case
+            match slice.find(end_c) {
+                Some(end) => (slice.slice_to(end), slice.slice_from(end + 1)),
+                None => fail!("incomplete string: {}", line)
+            },
+        _ => fail!("incomplete string: {}", line)
     }
 }
 
