@@ -33,7 +33,6 @@ impl<'r> LogStatsPrinter<'r> {
 
 #[inline]
 fn print_totals(totals: &ObjectStats, start: &Option<Tm>, end: &Option<Tm>) {
-    // FIXME: Too much .to_string()?
     let start_date = match *start {
         None => "-".to_string(),
         Some(ref s) => s.strftime("%Y-%m-%d")
