@@ -14,7 +14,7 @@ test: ${SOURCES}
 	./test
 
 debug: ${SOURCES}
-	rustc -Z debug-info $< -o $@
+	rustc -g $< -o $@
 
 clean:
 	rm -f httpstats.686 httpstats debug test
