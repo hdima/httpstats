@@ -1,5 +1,3 @@
-use std::io::Buffer;
-
 use time::{Tm, strptime};
 
 use super::{HTTPLogRecord, LogProcessor, HTTPStatus};
@@ -9,8 +7,8 @@ pub struct NginxLogParser<B> {
     buffer: B
 }
 
-impl<R: Buffer> NginxLogParser<R> {
-    pub fn new(buffer: R) -> NginxLogParser<R> {
+impl<B: Buffer> NginxLogParser<B> {
+    pub fn new(buffer: B) -> NginxLogParser<B> {
         NginxLogParser{buffer: buffer}
     }
 
