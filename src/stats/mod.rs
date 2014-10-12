@@ -1,6 +1,7 @@
 use std::hash::Hash;
 
 use std::collections::HashMap;
+use std::collections::hashmap::{Occupied, Vacant};
 
 use time::{Tm, Timespec};
 
@@ -111,16 +112,18 @@ fn update_totals(totals: &mut ObjectStats,  record: &HTTPLogRecord) {
 #[inline]
 fn update<T: Eq + Hash>(mapping: &mut StatsMap<T>, key: T,
         record: &HTTPLogRecord) {
-    mapping.insert_or_update_with(
-        key,
-        ObjectStats{
-            requests: 1,
-            request_time: record.request_time,
-            sent_bytes: record.sent_bytes,
-            },
-        |_, stats| {
+    match mapping.entry(key) {
+        Vacant(entry) => {
+            entry.set(ObjectStats{requests: 1,
+                                  request_time: record.request_time,
+                                  sent_bytes: record.sent_bytes,
+                                  });
+        },
+        Occupied(mut entry) => {
+            let stats = entry.get_mut();
             stats.requests += 1;
             stats.request_time += record.request_time;
             stats.sent_bytes += record.sent_bytes;
-        });
+        }
+    };
 }

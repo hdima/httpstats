@@ -22,7 +22,7 @@ impl<B: Buffer> NginxLogParser<B> {
 }
 
 #[inline]
-fn create_log_record<'t>(line: &'t str) -> HTTPLogRecord<'t> {
+fn create_log_record(line: &str) -> HTTPLogRecord {
     let (remote_addr, tail) = get_field(line);
     let (user, tail) = get_field(tail);
     let (local_time, tail) = get_local_time(tail);
@@ -51,7 +51,7 @@ fn create_log_record<'t>(line: &'t str) -> HTTPLogRecord<'t> {
 }
 
 #[inline]
-fn get_field<'t>(line: &'t str) -> (&'t str, &'t str) {
+fn get_field(line: &str) -> (&str, &str) {
     let slice = line.trim_left();
     match slice.find(' ') {
         Some(end) => (slice.slice_to(end), slice.slice_from(end + 1)),
@@ -69,7 +69,7 @@ fn get_field_or<'t>(line: &'t str, default: &'t str) -> (&'t str, &'t str) {
 }
 
 #[inline]
-fn skip_field<'t>(line: &'t str) -> &'t str {
+fn skip_field(line: &str) -> &str {
     let slice = line.trim_left();
     match slice.find(' ') {
         Some(end) => slice.slice_from(end + 1),
@@ -78,8 +78,8 @@ fn skip_field<'t>(line: &'t str) -> &'t str {
 }
 
 #[inline]
-fn get_delimited_field<'t>(line: &'t str, start_c: char, end_c: char) ->
-        (&'t str, &'t str) {
+fn get_delimited_field(line: &str, start_c: char, end_c: char) ->
+        (&str, &str) {
     match line.trim_left().slice_shift_char() {
         (Some(c), slice) if c == start_c =>
             // FIXME: Should we skip escaped end characters? But probably
@@ -93,7 +93,7 @@ fn get_delimited_field<'t>(line: &'t str, start_c: char, end_c: char) ->
 }
 
 #[inline]
-fn get_local_time<'t>(line: &'t str) -> (Tm, &'t str) {
+fn get_local_time(line: &str) -> (Tm, &str) {
     let (slice, tail) = get_delimited_field(line, '[', ']');
     match strptime(slice, "%d/%b/%Y:%H:%M:%S %z") {
         Ok(local_time) => (local_time, tail),
@@ -102,7 +102,7 @@ fn get_local_time<'t>(line: &'t str) -> (Tm, &'t str) {
 }
 
 #[inline]
-fn get_request_time<'t>(line: &'t str) -> (u64, &'t str) {
+fn get_request_time(line: &str) -> (u64, &str) {
     let (slice, tail) = get_field(line);
     match slice.find('.') {
         Some(pos) => {
@@ -115,7 +115,7 @@ fn get_request_time<'t>(line: &'t str) -> (u64, &'t str) {
 }
 
 #[inline]
-fn get_method_path<'t>(line: &'t str) -> ((&'t str, &'t str), &'t str) {
+fn get_method_path(line: &str) -> ((&str, &str), &str) {
     let (slice, tail) = get_delimited_field(line, '"', '"');
     let (method, req_tail) = get_field_or(slice, "");
     let (path, _) = get_field_or(req_tail, "");
@@ -123,7 +123,7 @@ fn get_method_path<'t>(line: &'t str) -> ((&'t str, &'t str), &'t str) {
 }
 
 #[inline]
-fn get_int<'t>(line: &'t str) -> (u64, &'t str) {
+fn get_int(line: &str) -> (u64, &str) {
     let (slice, tail) = get_field(line);
     (from_str(slice).unwrap(), tail)
 }

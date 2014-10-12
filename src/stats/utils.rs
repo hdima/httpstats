@@ -17,10 +17,10 @@ pub fn format_duration(duration: u64) -> String {
     let int_part = (n / pow(10, pos)).to_string();
     let mut fract_part = String::with_capacity(pos as uint + 1);
     if pos != 0 && n != 0 {
-        fract_part.push_char('.');
+        fract_part.push('.');
         while pos > 0 {
             let digit = (n / pow(10, pos - 1)) % 10;
-            fract_part.push_char((digit as u8 + '0' as u8) as char);
+            fract_part.push((digit as u8 + '0' as u8) as char);
             pos -= 1;
         }
     }
@@ -37,23 +37,23 @@ fn pow(n: u64, p: uint) -> u64 {
 }
 
 pub fn format_bytes(mut bytes: u64) -> String {
-    static modifiers: [&'static str, ..5] = ["T", "G", "M", "K", ""];
-    let mut i = modifiers.len() - 1;
+    static MODIFIERS: [&'static str, ..5] = ["T", "G", "M", "K", ""];
+    let mut i = MODIFIERS.len() - 1;
     while bytes >= 1024 && i != 0 {
         bytes = (bytes / 1024) + (bytes % 1024) / 513;
         i -= 1;
     }
-    bytes.to_string() + modifiers[i]
+    bytes.to_string() + MODIFIERS[i]
 }
 
 pub fn format_number(mut bytes: u64) -> String {
-    static modifiers: [&'static str, ..5] = ["T", "G", "M", "K", ""];
-    let mut i = modifiers.len() - 1;
+    static MODIFIERS: [&'static str, ..5] = ["T", "G", "M", "K", ""];
+    let mut i = MODIFIERS.len() - 1;
     while bytes >= 1000 && i != 0 {
         bytes = (bytes / 1000) + (bytes % 1000) / 501;
         i -= 1;
     }
-    bytes.to_string() + modifiers[i]
+    bytes.to_string() + MODIFIERS[i]
 }
 
 /*
