@@ -55,7 +55,7 @@ fn get_field(line: &str) -> (&str, &str) {
     let slice = line.trim_left();
     match slice.find(' ') {
         Some(end) => (slice.slice_to(end), slice.slice_from(end + 1)),
-        None => fail!("incomplete string: {}", line)
+        None => panic!("incomplete string: {}", line)
     }
 }
 
@@ -73,7 +73,7 @@ fn skip_field(line: &str) -> &str {
     let slice = line.trim_left();
     match slice.find(' ') {
         Some(end) => slice.slice_from(end + 1),
-        None => fail!("incomplete string: {}", line)
+        None => panic!("incomplete string: {}", line)
     }
 }
 
@@ -86,9 +86,9 @@ fn get_delimited_field(line: &str, start_c: char, end_c: char) ->
             // not so important in this case
             match slice.find(end_c) {
                 Some(end) => (slice.slice_to(end), slice.slice_from(end + 1)),
-                None => fail!("incomplete string: {}", line)
+                None => panic!("incomplete string: {}", line)
             },
-        _ => fail!("incomplete string: {}", line)
+        _ => panic!("incomplete string: {}", line)
     }
 }
 
@@ -97,7 +97,7 @@ fn get_local_time(line: &str) -> (Tm, &str) {
     let (slice, tail) = get_delimited_field(line, '[', ']');
     match strptime(slice, "%d/%b/%Y:%H:%M:%S %z") {
         Ok(local_time) => (local_time, tail),
-        Err(err) => fail!("time parse error for {}: {}", line, err)
+        Err(err) => panic!("time parse error for {}: {}", line, err)
     }
 }
 
@@ -110,7 +110,7 @@ fn get_request_time(line: &str) -> (u64, &str) {
             let msec: u64 = from_str(slice.slice_from(pos + 1)).unwrap();
             (sec * 1000 + msec, tail)
         }
-        None => fail!("invalid request time: {}", line)
+        None => panic!("invalid request time: {}", line)
     }
 }
 

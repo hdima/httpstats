@@ -26,7 +26,7 @@ impl GzipReader {
             gzopen(path.to_c_str().unwrap(), "rb".to_c_str().unwrap())
         };
         if file.is_null() {
-            fail!("ERROR opening '{}': {}", path.as_str(), last_os_error());
+            panic!("ERROR opening '{}': {}", path.as_str(), last_os_error());
         }
         Some(GzipReader{file: file, path: path.clone(), closed: false})
     }
