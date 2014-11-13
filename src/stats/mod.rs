@@ -77,7 +77,8 @@ impl LogProcessor for LogStats {
         update(&mut self.referers, record.referer.into_string(), &record);
         update(&mut self.user_agents, record.user_agent.into_string(), &record);
         update(&mut self.hours, record.local_time.tm_hour as u8, &record);
-        update(&mut self.dates, record.local_time.strftime("%Y-%m-%d").unwrap(),
+        update(&mut self.dates,
+            record.local_time.strftime("%Y-%m-%d").unwrap().to_string(),
             &record);
         update(&mut self.users, record.user.into_string(), &record);
     }

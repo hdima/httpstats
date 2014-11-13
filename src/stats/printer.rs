@@ -35,11 +35,11 @@ impl<'r> LogStatsPrinter<'r> {
 fn print_totals(totals: &ObjectStats, start: &Option<Tm>, end: &Option<Tm>) {
     let start_date = match *start {
         None => "-".to_string(),
-        Some(ref s) => s.strftime("%Y-%m-%d").unwrap()
+        Some(ref s) => s.strftime("%Y-%m-%d").unwrap().to_string()
     };
     let end_date = match *end {
         None => "-".to_string(),
-        Some(ref e) => e.strftime("%Y-%m-%d").unwrap()
+        Some(ref e) => e.strftime("%Y-%m-%d").unwrap().to_string()
     };
     println!("Totals\n\
               =====================================================\
