@@ -1,4 +1,3 @@
-- Proper error reporting for GzipReader
 - Simpler/faster hash function for HashMap?
 - Create proper URLs by adding domain to paths in the request by paths list
     - Probably we also need to store if request is HTTP or HTTPS to create
