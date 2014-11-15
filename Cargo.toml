@@ -1,0 +1,8 @@
+[package]
+
+name = "httpstats"
+version = "0.0.2"
+authors = ["Dmitry Vasiliev <dima@hlabs.org>"]
+
+[dependencies.time]
+git = "https://github.com/rust-lang/time"

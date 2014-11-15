@@ -1,6 +1,4 @@
-httpstats
-httpstats.686
-debug
-test
-access.log
-access.log.*
+/Cargo.lock
+/target
+/access.log
+/access.log.*

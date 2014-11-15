@@ -1,9 +1,3 @@
-- Time library now provided externally. Can be added with the following Cargo
-  manifest:
-
-    [dependencies.time]
-    git = "https://github.com/rust-lang/time"
-
 - Proper error reporting for GzipReader
 - Simpler/faster hash function for HashMap?
 - Create proper URLs by adding domain to paths in the request by paths list
