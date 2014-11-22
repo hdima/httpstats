@@ -81,7 +81,7 @@ fn skip_field(line: &str) -> &str {
 fn get_delimited_field(line: &str, start_c: char, end_c: char) ->
         (&str, &str) {
     match line.trim_left().slice_shift_char() {
-        (Some(c), slice) if c == start_c =>
+        Some((c, slice)) if c == start_c =>
             // FIXME: Should we skip escaped end characters? But probably
             // not so important in this case
             match slice.find(end_c) {

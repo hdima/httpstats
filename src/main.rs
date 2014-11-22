@@ -60,10 +60,10 @@ fn main() {
     let opts = [
         optopt("n", "", "number of items to print", "NUMBER")
     ];
-    let matches = match getopts(args.tail(), opts) {
+    let matches = match getopts(args.tail(), &opts) {
         Ok(m) => m,
         Err(err) => {
-            print_usage(err.to_string().as_slice(), program.as_slice(), opts);
+            print_usage(err.to_string().as_slice(), program.as_slice(), &opts);
             return;
         }
     };
@@ -72,12 +72,12 @@ fn main() {
             Ok(n) => parse(matches.free.as_slice(), n),
             Err(_str_n) => {
                 print_usage("Invalid number of items provided",
-                            program.as_slice(), opts);
+                            program.as_slice(), &opts);
                 return;
             }
         }
     } else {
-        print_usage("No log files provided", program.as_slice(), opts);
+        print_usage("No log files provided", program.as_slice(), &opts);
         return;
     }
 }
