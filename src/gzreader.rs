@@ -22,7 +22,7 @@ pub struct GzipReader {
 impl GzipReader {
     pub fn open(path: &Path) -> IoResult<GzipReader> {
         let file = unsafe {
-            gzopen(path.to_c_str().unwrap(), "rb".to_c_str().unwrap())
+            gzopen(path.to_c_str().as_ptr(), "rb".to_c_str().as_ptr())
         };
         if !file.is_null() {
             Ok(GzipReader{file: file, path: path.clone(), closed: false})
