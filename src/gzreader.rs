@@ -35,7 +35,7 @@ impl GzipReader {
         let mut errnum: c_int = 0;
         let msg = unsafe {CString::new(gzerror(self.file, &mut errnum), true)};
         if errnum < 0 {
-            let detail = self.path.as_str().unwrap().into_string()
+            let detail = self.path.as_str().unwrap().to_string()
                          + msg.as_str().unwrap();
             Some(IoError{kind: OtherIoError,
                          desc: "GZip reader error",

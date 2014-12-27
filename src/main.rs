@@ -43,7 +43,7 @@ fn print_usage(msg: &str, program: &str, opts: &[OptGroup]) {
 fn items_to_print(opt: Option<String>) -> Result<uint, String> {
     match opt {
         Some(str_n) => {
-            let n_opt: Option<uint> =  from_str(str_n.as_slice());
+            let n_opt: Option<uint> =  str_n.parse::<uint>();
             match n_opt {
                 Some(n) if n > 0 => Ok(n),
                 _ => Err(str_n)

@@ -24,7 +24,7 @@ pub fn format_duration(duration: u64) -> String {
             pos -= 1;
         }
     }
-    int_part + fract_part + modifier
+    int_part + fract_part.as_slice() + modifier.as_slice()
 }
 
 // FIXME: Can we replace it with std::num::pow?

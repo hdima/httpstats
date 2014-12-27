@@ -9,7 +9,7 @@ pub mod nginx;
 mod utils;
 
 
-#[deriving(PartialEq, Eq, Hash)]
+#[deriving(PartialEq, Eq, Hash, Copy)]
 pub struct HTTPStatus {
     status: u16,
 }

@@ -1,7 +1,7 @@
 use std::hash::Hash;
 
 use std::collections::HashMap;
-use std::collections::hash_map::{Occupied, Vacant};
+use std::collections::hash_map::Entry;
 
 use time::{Tm, Timespec};
 
@@ -69,18 +69,18 @@ impl LogProcessor for LogStats {
     fn process(&mut self, record: HTTPLogRecord) {
         update_interval(self, &record.local_time);
         update_totals(&mut self.total, &record);
-        update(&mut self.clients, record.remote_addr.into_string(), &record);
-        update(&mut self.hosts, record.host.into_string(), &record);
-        update(&mut self.methods, record.method.into_string(), &record);
-        update(&mut self.paths, record.path.into_string(), &record);
+        update(&mut self.clients, record.remote_addr.to_string(), &record);
+        update(&mut self.hosts, record.host.to_string(), &record);
+        update(&mut self.methods, record.method.to_string(), &record);
+        update(&mut self.paths, record.path.to_string(), &record);
         update(&mut self.statuses, record.status, &record);
-        update(&mut self.referers, record.referer.into_string(), &record);
-        update(&mut self.user_agents, record.user_agent.into_string(), &record);
+        update(&mut self.referers, record.referer.to_string(), &record);
+        update(&mut self.user_agents, record.user_agent.to_string(), &record);
         update(&mut self.hours, record.local_time.tm_hour as u8, &record);
         update(&mut self.dates,
             record.local_time.strftime("%Y-%m-%d").unwrap().to_string(),
             &record);
-        update(&mut self.users, record.user.into_string(), &record);
+        update(&mut self.users, record.user.to_string(), &record);
     }
 }
 
@@ -114,13 +114,13 @@ fn update_totals(totals: &mut ObjectStats,  record: &HTTPLogRecord) {
 fn update<T: Eq + Hash>(mapping: &mut StatsMap<T>, key: T,
         record: &HTTPLogRecord) {
     match mapping.entry(key) {
-        Vacant(entry) => {
+        Entry::Vacant(entry) => {
             entry.set(ObjectStats{requests: 1,
                                   request_time: record.request_time,
                                   sent_bytes: record.sent_bytes,
                                   });
         },
-        Occupied(mut entry) => {
+        Entry::Occupied(mut entry) => {
             let stats = entry.get_mut();
             stats.requests += 1;
             stats.request_time += record.request_time;

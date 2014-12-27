@@ -106,8 +106,8 @@ fn get_request_time(line: &str) -> (u64, &str) {
     let (slice, tail) = get_field(line);
     match slice.find('.') {
         Some(pos) => {
-            let sec: u64 = from_str(slice.slice_to(pos)).unwrap();
-            let msec: u64 = from_str(slice.slice_from(pos + 1)).unwrap();
+            let sec: u64 = slice.slice_to(pos).parse::<u64>().unwrap();
+            let msec: u64 = slice.slice_from(pos + 1).parse::<u64>().unwrap();
             (sec * 1000 + msec, tail)
         }
         None => panic!("invalid request time: {}", line)
@@ -125,5 +125,5 @@ fn get_method_path(line: &str) -> ((&str, &str), &str) {
 #[inline]
 fn get_int(line: &str) -> (u64, &str) {
     let (slice, tail) = get_field(line);
-    (from_str(slice).unwrap(), tail)
+    (slice.parse::<u64>().unwrap(), tail)
 }

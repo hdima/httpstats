@@ -12,7 +12,7 @@ pub struct LogStatsPrinter<'r> {
 }
 
 impl<'r> LogStatsPrinter<'r> {
-    pub fn new<'r>(stats: &'r LogStats) -> LogStatsPrinter<'r> {
+    pub fn new(stats: &LogStats) -> LogStatsPrinter {
         LogStatsPrinter{stats: stats}
     }
 
